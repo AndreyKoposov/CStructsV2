@@ -66,6 +66,7 @@ int vecres(Vector *v, size_t new_cap) {
 
     size_t cap = v->capacity ? v->capacity : 1;
 
+    // Увеличиваем размер вектора
     while (cap < new_cap) {
         if (cap > SIZE_MAX / v->elem_size / RESERVE_FACTOR) {
             cap = new_cap;
@@ -79,25 +80,25 @@ int vecres(Vector *v, size_t new_cap) {
 
 int vecshr(Vector *v) {
     if (!v) return -1;
-    
+
     return _vec_realloc(v, v->size);
 }
 
-void* vecat(Vector* v, size_t i) {
+// void* vecat(Vector* v, size_t i) {
 
-}
+// }
 
-void* vecpush(Vector* v, void* el) {
+// void* vecpush(Vector* v, void* el) {
     
-}
+// }
 
-void* vecfront(Vector* v) {
+// void* vecfront(Vector* v) {
     
-}
+// }
 
-void* vecback(Vector* v) {
+// void* vecback(Vector* v) {
     
-}
+// }
 
 size_t vecsize(const Vector *v) { return v->size; }
 size_t veccap(const Vector *v) { return v->capacity; }
