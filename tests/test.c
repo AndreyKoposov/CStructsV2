@@ -17,6 +17,9 @@ int main() {
     if (vectorS == NULL) cleanup();
 
     if (!CU_add_test(vectorS, "Create", test_create)) cleanup();
+    if (!CU_add_test(vectorS, "Destroy", test_destroy)) cleanup();
+    if (!CU_add_test(vectorS, "Reserve", test_reserve)) cleanup();
+    if (!CU_add_test(vectorS, "Shrink", test_shrink)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();

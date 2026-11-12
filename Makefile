@@ -13,8 +13,8 @@ BUILD := build
 .PHONY: lib test clean 
 
 # === Tests ===
-test: $(BUILD)/test lib
-	$(VFLAGS) $<
+test: lib $(BUILD)/test
+	$(VFLAGS) $(BUILD)/test
 
 $(BUILD)/test: $(BUILD)/test.o $(BUILD)/test_vector.o
 	$(CC) $(CFLAGS) $^ -Lbuild -lstructs -lcunit -o $@
