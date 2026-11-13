@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include <stdint.h>
 
 #include "structs/vector.h"
@@ -63,12 +62,14 @@ void vecdes(Vector *v) {
 
 int vecres(Vector *v, size_t new_cap) {
     if (!v) return -1;
+    if (new_cap == 0)
+        return _vec_realloc(v, 0);
 
     size_t cap = v->capacity ? v->capacity : 1;
 
     // Увеличиваем размер вектора
     while (cap < new_cap) {
-        if (cap > SIZE_MAX / v->elem_size / RESERVE_FACTOR) {
+        if (cap > SIZE_MAX / RESERVE_FACTOR) {
             cap = new_cap;
             break;
         }
@@ -102,4 +103,4 @@ int vecshr(Vector *v) {
 
 size_t vecsize(const Vector *v) { return v->size; }
 size_t veccap(const Vector *v) { return v->capacity; }
-int vecemp(const Vector *v) { return v->size == 0; }
+bool vecemp(const Vector *v) { return v->size == 0; }

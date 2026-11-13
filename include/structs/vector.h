@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <stdbool.h>
+
 #ifndef VECTOR_H
 #define VECTOR_H
 
@@ -8,7 +11,7 @@ Vector* veccre(size_t elem_size);
 void vecdes(Vector *v);
 size_t vecsize(const Vector *v);
 size_t veccap(const Vector *v);
-int vecemp(const Vector *v);
+bool vecemp(const Vector *v);
 int vecres(Vector *v, size_t new_cap);
 int vecshr(Vector *v);
 // void* vecat(Vector* v, size_t i);
