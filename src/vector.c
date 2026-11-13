@@ -69,7 +69,7 @@ int vecres(Vector *v, size_t new_cap) {
 
     // Увеличиваем размер вектора
     while (cap < new_cap) {
-        if (cap > SIZE_MAX / RESERVE_FACTOR) {
+        if (cap > SIZE_MAX / v->elem_size / RESERVE_FACTOR) {
             cap = new_cap;
             break;
         }
