@@ -3,7 +3,7 @@ CFLAGS := -Wall -Wextra -O2 -Wpedantic -Iinclude
 TFLAGS := -Wall -Wextra -O0 -Wpedantic -Iinclude -Itests
 AR := ar
 ARFLAGS := rcs
-VFLAGS := valgrind --leak-check=full
+VFLAGS := valgrind --leak-check=full --track-origins=yes
 
 SRC := src
 TESTS := tests
@@ -28,16 +28,13 @@ $(BUILD)/test_vector.o: $(TESTS)/test_vector.c
 # === Lib ===
 lib: $(BUILD)/libstructs.a
 
-$(BUILD)/libstructs.a: $(BUILD)/int.o $(BUILD)/vector.o
+$(BUILD)/libstructs.a: $(BUILD)/vector.o
 	$(AR) $(ARFLAGS) $@ $^
-
-$(BUILD)/int.o: $(SRC)/int.c
-	$(CC) $(CFLAGS) -c $^ -o $@
 
 $(BUILD)/vector.o: $(SRC)/vector.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 # === Clean up ===
 clean:
-	rm -r $(BUILD)
+	rm -r $(BUILD) & mkdir -p build
 

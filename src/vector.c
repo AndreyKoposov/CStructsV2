@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <string.h>
 
 #include "structs/vector.h"
 
@@ -38,6 +39,10 @@ static int _vec_realloc(Vector* v, size_t new_cap) {
     v->capacity = new_cap;
 
     return 0;
+}
+
+static inline void* _vec_elem_ptr(const Vector *v, size_t i) {
+    return (char *)v->data + i * v->elem_size;
 }
 
 Vector* veccre(size_t elem_size) {
@@ -85,21 +90,37 @@ int vecshr(Vector *v) {
     return _vec_realloc(v, v->size);
 }
 
-// void* vecat(Vector* v, size_t i) {
+void* vecat(Vector* v, size_t i) {
+    if (i >= v->size) 
+        return NULL;
+    else
+        return _vec_elem_ptr(v, i);
+}
 
-// }
+void vecpush(Vector* v, void* el) {
+    if (v->capacity == v->size) {
+        if (vecres(v, v->size + 1) == -1) {
+            return;
+        }
+    }
+    memcpy(_vec_elem_ptr(v, v->size), el, v->elem_size);
+    v->size++;
+}
 
-// void* vecpush(Vector* v, void* el) {
-    
-// }
+void* vecfront(Vector* v) {
+    return _vec_elem_ptr(v, 0);
+}
 
-// void* vecfront(Vector* v) {
-    
-// }
+void* vecback(Vector* v) {
+    return _vec_elem_ptr(v, v->size-1);
+}
 
-// void* vecback(Vector* v) {
-    
-// }
+void* vecpop(Vector* v) {
+    void* data = vecback(v);
+    v->size--;
+
+    return data;
+}
 
 size_t vecsize(const Vector *v) { return v->size; }
 size_t veccap(const Vector *v) { return v->capacity; }

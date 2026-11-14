@@ -20,6 +20,9 @@ int main() {
     if (!CU_add_test(vectorS, "Destroy", test_destroy)) cleanup();
     if (!CU_add_test(vectorS, "Reserve", test_reserve)) cleanup();
     if (!CU_add_test(vectorS, "Shrink", test_shrink)) cleanup();
+    if (!CU_add_test(vectorS, "Push", test_push)) cleanup();
+    if (!CU_add_test(vectorS, "Pop", test_pop)) cleanup();
+    if (!CU_add_test(vectorS, "At", test_at)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();

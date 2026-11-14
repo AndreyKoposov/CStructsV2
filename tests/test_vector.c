@@ -3,14 +3,13 @@
 #include <CUnit/Basic.h>
 
 #include "structs/vector.h"
-#include "objects/int.h"
 
 
 void test_create(void) {
     // Arrange
 
     // Act
-    Vector* v = veccre(sizeof(Integer));
+    Vector* v = veccre(sizeof(int));
 
     // Assert
     CU_ASSERT_EQUAL(vecsize(v), 0);
@@ -23,13 +22,21 @@ void test_create(void) {
 
 void test_destroy(void) {
     // Arrange
-    Vector* v1 = veccre(sizeof(Integer));
-    Vector* v2 = veccre(sizeof(Integer));
+    Vector* v1 = veccre(sizeof(int));
+    Vector* v2 = veccre(sizeof(int));
+    Vector* v3 = veccre(sizeof(int));
+
     vecres(v2, 10);
+    
+    int a = 0, b = 0, c = 0;
+    vecpush(v3, &a);
+    vecpush(v3, &b);
+    vecpush(v3, &c);
 
     // Act
     vecdes(v1);
     vecdes(v2);
+    vecdes(v3);
 
     // Assert
     CU_ASSERT(1);
@@ -37,12 +44,12 @@ void test_destroy(void) {
 
 void test_reserve(void) {
     // Arrange
-    Vector* v1 = veccre(sizeof(Integer));
-    Vector* v2 = veccre(sizeof(Integer));
-    Vector* v3 = veccre(sizeof(Integer));
-    Vector* v4 = veccre(sizeof(Integer));
-    Vector* v5 = veccre(sizeof(Integer));
-    Vector* v6 = veccre(sizeof(Integer));
+    Vector* v1 = veccre(sizeof(int));
+    Vector* v2 = veccre(sizeof(int));
+    Vector* v3 = veccre(sizeof(int));
+    Vector* v4 = veccre(sizeof(int));
+    Vector* v5 = veccre(sizeof(int));
+    Vector* v6 = veccre(sizeof(int));
 
     // Act
     int status1 = vecres(v1, 10);
@@ -99,13 +106,21 @@ void test_reserve(void) {
 
 void test_shrink(void) {
     // Arrange
-    Vector* v1 = veccre(sizeof(Integer));
-    Vector* v2 = veccre(sizeof(Integer));
+    Vector* v1 = veccre(sizeof(int));
+    Vector* v2 = veccre(sizeof(int));
+    Vector* v3 = veccre(sizeof(int));
     vecres(v2, 10);
+    vecres(v3, 10);
+
+    int a = 0, b = 0, c= 0;
+    vecpush(v3, &a);
+    vecpush(v3, &b);
+    vecpush(v3, &c);
 
     // Act
     int status1 = vecshr(v1);
     int status2 = vecshr(v2);
+    int status3 = vecshr(v3);
 
     // Assert
     CU_ASSERT_EQUAL(status1, 0);
@@ -116,7 +131,85 @@ void test_shrink(void) {
     CU_ASSERT_EQUAL(vecsize(v2), 0);
     CU_ASSERT_EQUAL(veccap(v2), 0);
 
+    CU_ASSERT_EQUAL(status3, 0);
+    CU_ASSERT_EQUAL(vecsize(v3), 3);
+    CU_ASSERT_EQUAL(veccap(v3), 3);
+
     // Clean up
     vecdes(v1);
     vecdes(v2);
+    vecdes(v3);
+}
+
+void test_push(void) {
+    // Arrange
+    Vector* v1 = veccre(sizeof(int));
+    Vector* v2 = veccre(sizeof(int));
+    int i = 3;
+    size_t n = 10;
+
+    // Act
+    vecpush(v1, &i);
+
+    for (size_t j = 0; j < n; j++)
+        vecpush(v2, &j);
+
+    // Assert
+    int* val = vecat(v1, 0);
+    CU_ASSERT_EQUAL(*val, i);
+
+    for (size_t j = 0; j < n; j++)
+        CU_ASSERT_EQUAL(*(int*)vecat(v2, j), j);
+
+    // Clean up
+    vecdes(v1);
+    vecdes(v2);
+}
+
+void test_pop() {
+    // Arrange
+    Vector* v1 = veccre(sizeof(int));
+    Vector* v2 = veccre(sizeof(int));
+    int i = 5;
+    size_t n = 10;
+
+    vecpush(v1, &i);
+
+    for (size_t j = 0; j < n; j++)
+        vecpush(v2, &j);
+
+    // Act
+    int* poped = vecpop(v1);
+    for (size_t j = 0; j < n; j++)
+        vecpop(v2);
+
+    // Assert
+    CU_ASSERT_EQUAL(*poped, i);
+    CU_ASSERT_EQUAL(vecsize(v2), 0);
+
+    // Clean up
+    vecdes(v1);
+    vecdes(v2);
+}
+
+void test_at(void) {
+    // Arrange
+    Vector* v1 = veccre(sizeof(int));
+    vecres(v1, 10);
+
+    int a = 2;
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+
+    // Act
+    int* val1 = vecat(v1, 1);
+    int* val2 = vecat(v1, 4);
+
+    // Assert
+    CU_ASSERT_EQUAL(*val1, a);
+    CU_ASSERT_PTR_EQUAL(val2, NULL);
+
+    // Clean up
+    vecdes(v1);
 }

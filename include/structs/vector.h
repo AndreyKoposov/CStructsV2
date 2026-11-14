@@ -14,9 +14,10 @@ size_t veccap(const Vector *v);
 bool vecemp(const Vector *v);
 int vecres(Vector *v, size_t new_cap);
 int vecshr(Vector *v);
-// void* vecat(Vector* v, size_t i);
-// void* vecpush(Vector* v, void* el);
-// void* vecfront(Vector* v);
-// void* vecback(Vector* v);
+void* vecat(Vector* v, size_t i);
+void vecpush(Vector* v, void* el);
+void* vecfront(Vector* v);
+void* vecback(Vector* v);
+void* vecpop(Vector* v);
 
 #endif
