@@ -154,12 +154,18 @@ void test_push(void) {
     for (size_t j = 0; j < n; j++)
         vecpush(v2, &j);
 
+    int status1 = vecpush(NULL, &i);
+    int status2 = vecpush(v2, NULL);
+
     // Assert
     int* val = vecat(v1, 0);
     CU_ASSERT_EQUAL(*val, i);
 
     for (size_t j = 0; j < n; j++)
         CU_ASSERT_EQUAL(*(int*)vecat(v2, j), j);
+
+    CU_ASSERT_EQUAL(status1, -1);
+    CU_ASSERT_EQUAL(status2, -1);
 
     // Clean up
     vecdes(v1);
@@ -179,12 +185,14 @@ void test_pop() {
         vecpush(v2, &j);
 
     // Act
-    int* poped = vecpop(v1);
+    int poped;
+    vecpop(v1, &poped);
+
     for (size_t j = 0; j < n; j++)
-        vecpop(v2);
+        vecpop(v2, NULL);
 
     // Assert
-    CU_ASSERT_EQUAL(*poped, i);
+    CU_ASSERT_EQUAL(poped, i);
     CU_ASSERT_EQUAL(vecsize(v2), 0);
 
     // Clean up

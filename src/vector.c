@@ -91,35 +91,44 @@ int vecshr(Vector *v) {
 }
 
 void* vecat(Vector* v, size_t i) {
-    if (i >= v->size) 
+    if (i >= v->size || v->size == 0) 
         return NULL;
     else
         return _vec_elem_ptr(v, i);
 }
 
-void vecpush(Vector* v, void* el) {
+int vecpush(Vector* v, void* el) {
+    if (!v || !el) return -1;
+
     if (v->capacity == v->size) {
         if (vecres(v, v->size + 1) == -1) {
-            return;
+            return -1;
         }
     }
     memcpy(_vec_elem_ptr(v, v->size), el, v->elem_size);
     v->size++;
+
+    return 0;
 }
 
 void* vecfront(Vector* v) {
-    return _vec_elem_ptr(v, 0);
+    return vecat(v, 0);
 }
 
 void* vecback(Vector* v) {
-    return _vec_elem_ptr(v, v->size-1);
+    return vecat(v, v->size-1);
 }
 
-void* vecpop(Vector* v) {
-    void* data = vecback(v);
-    v->size--;
+void vecpop(Vector* v, void* out) {
+    if (out)
+        memcpy(out, vecback(v), v->elem_size);
 
-    return data;
+    v->size--;
+}
+
+void veccle(Vector* v) {
+    if (!v) return;
+    v->size = 0;
 }
 
 size_t vecsize(const Vector *v) { return v->size; }
