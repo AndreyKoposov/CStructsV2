@@ -7,7 +7,7 @@
 
 typedef struct vector Vector;
 
-Vector* veccre(size_t elem_size);
+Vector* vector(size_t elem_size);
 void vecdes(Vector *v);
 size_t vecsize(const Vector *v);
 size_t veccap(const Vector *v);

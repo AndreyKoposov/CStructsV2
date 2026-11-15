@@ -9,7 +9,7 @@ void test_create(void) {
     // Arrange
 
     // Act
-    Vector* v = veccre(sizeof(int));
+    Vector* v = vector(sizeof(int));
 
     // Assert
     CU_ASSERT_EQUAL(vecsize(v), 0);
@@ -22,9 +22,9 @@ void test_create(void) {
 
 void test_destroy(void) {
     // Arrange
-    Vector* v1 = veccre(sizeof(int));
-    Vector* v2 = veccre(sizeof(int));
-    Vector* v3 = veccre(sizeof(int));
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
+    Vector* v3 = vector(sizeof(int));
 
     vecres(v2, 10);
     
@@ -44,12 +44,12 @@ void test_destroy(void) {
 
 void test_reserve(void) {
     // Arrange
-    Vector* v1 = veccre(sizeof(int));
-    Vector* v2 = veccre(sizeof(int));
-    Vector* v3 = veccre(sizeof(int));
-    Vector* v4 = veccre(sizeof(int));
-    Vector* v5 = veccre(sizeof(int));
-    Vector* v6 = veccre(sizeof(int));
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
+    Vector* v3 = vector(sizeof(int));
+    Vector* v4 = vector(sizeof(int));
+    Vector* v5 = vector(sizeof(int));
+    Vector* v6 = vector(sizeof(int));
 
     // Act
     int status1 = vecres(v1, 10);
@@ -106,9 +106,9 @@ void test_reserve(void) {
 
 void test_shrink(void) {
     // Arrange
-    Vector* v1 = veccre(sizeof(int));
-    Vector* v2 = veccre(sizeof(int));
-    Vector* v3 = veccre(sizeof(int));
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
+    Vector* v3 = vector(sizeof(int));
     vecres(v2, 10);
     vecres(v3, 10);
 
@@ -143,8 +143,8 @@ void test_shrink(void) {
 
 void test_push(void) {
     // Arrange
-    Vector* v1 = veccre(sizeof(int));
-    Vector* v2 = veccre(sizeof(int));
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
     int i = 3;
     size_t n = 10;
 
@@ -174,8 +174,8 @@ void test_push(void) {
 
 void test_pop() {
     // Arrange
-    Vector* v1 = veccre(sizeof(int));
-    Vector* v2 = veccre(sizeof(int));
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
     int i = 5;
     size_t n = 10;
 
@@ -202,7 +202,7 @@ void test_pop() {
 
 void test_at(void) {
     // Arrange
-    Vector* v1 = veccre(sizeof(int));
+    Vector* v1 = vector(sizeof(int));
     vecres(v1, 10);
 
     int a = 2;
@@ -224,7 +224,7 @@ void test_at(void) {
 
 void test_back(void) {
     // Arrange
-    Vector* v1 = veccre(sizeof(int));
+    Vector* v1 = vector(sizeof(int));
 
     // Act
     int* val = vecback(v1);
@@ -238,7 +238,7 @@ void test_back(void) {
 
 void test_get(void) {
     // Arrange
-    Vector* v1 = veccre(sizeof(int));
+    Vector* v1 = vector(sizeof(int));
     int a = 2;
     vecpush(v1, &a);
 
@@ -264,7 +264,7 @@ static void add(void* el, void* ctx) {
 
 void test_for(void) {
     // Arrange
-    Vector* v1 = veccre(sizeof(int));
+    Vector* v1 = vector(sizeof(int));
     int a = 2;
     vecpush(v1, &a);
     vecpush(v1, &a);

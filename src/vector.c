@@ -45,7 +45,7 @@ static inline void* _vec_elem_ptr(const Vector *v, size_t i) {
     return (char *)v->data + i * v->elem_size;
 }
 
-Vector* veccre(size_t elem_size) {
+Vector* vector(size_t elem_size) {
     if (elem_size == 0) return NULL;
 
     Vector* v = malloc(sizeof(Vector));
