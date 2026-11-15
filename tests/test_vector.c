@@ -221,3 +221,66 @@ void test_at(void) {
     // Clean up
     vecdes(v1);
 }
+
+void test_back(void) {
+    // Arrange
+    Vector* v1 = veccre(sizeof(int));
+
+    // Act
+    int* val = vecback(v1);
+
+    // Assert
+    CU_ASSERT_PTR_EQUAL(val, NULL);
+
+    // Clean up
+    vecdes(v1);
+}
+
+void test_get(void) {
+    // Arrange
+    Vector* v1 = veccre(sizeof(int));
+    int a = 2;
+    vecpush(v1, &a);
+
+    // Act
+    int out;
+    vecget(v1, 0, &out);
+    out = 4;
+
+    // Assert
+    int* p = (int*)vecat(v1, 0);
+    CU_ASSERT_EQUAL(*p, a);
+
+    // Clean up
+    vecdes(v1);
+}
+
+static void add(void* el, void* ctx) {
+    int* i = el;
+    int* add = ctx;
+
+    *i += *add;
+}
+
+void test_for(void) {
+    // Arrange
+    Vector* v1 = veccre(sizeof(int));
+    int a = 2;
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    int to_add = 2;
+    
+    // Act
+    vecfor(v1, add, &to_add);
+
+    // Assert
+    for (size_t i = 0; i < vecsize(v1); i++) {
+        int* actual = vecat(v1, i);
+        CU_ASSERT_EQUAL(*actual, a + to_add);
+    }
+
+    // Clean up
+    vecdes(v1);
+}
+

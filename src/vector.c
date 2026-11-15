@@ -90,11 +90,19 @@ int vecshr(Vector *v) {
     return _vec_realloc(v, v->size);
 }
 
-void* vecat(Vector* v, size_t i) {
-    if (i >= v->size || v->size == 0) 
+void* vecat(const Vector* v, size_t i) {
+    if (v->size == 0 || i >= v->size) 
         return NULL;
     else
         return _vec_elem_ptr(v, i);
+}
+
+void* vecfront(const Vector* v) {
+    return vecat(v, 0);
+}
+
+void* vecback(const Vector* v) {
+    return vecat(v, v->size-1);
 }
 
 int vecpush(Vector* v, void* el) {
@@ -111,24 +119,34 @@ int vecpush(Vector* v, void* el) {
     return 0;
 }
 
-void* vecfront(Vector* v) {
-    return vecat(v, 0);
-}
-
-void* vecback(Vector* v) {
-    return vecat(v, v->size-1);
-}
-
-void vecpop(Vector* v, void* out) {
+int vecpop(Vector* v, void* out) {
+    if (!v) return -1;
     if (out)
         memcpy(out, vecback(v), v->elem_size);
 
     v->size--;
+
+    return 0;
+}
+
+int vecget(const Vector* v, size_t i, void* out) {
+    if (!v) return -1;
+    if (out)
+        memcpy(out, vecat(v, i), v->elem_size);
+
+    return 0;
 }
 
 void veccle(Vector* v) {
     if (!v) return;
     v->size = 0;
+}
+
+void vecfor(Vector* v, void (*fn)(void* el, void* ctx), void* ctx) {
+    if (!v || !fn) 
+        return;
+    for (size_t i = 0; i < v->size; i++)
+        fn(_vec_elem_ptr(v, i), ctx);
 }
 
 size_t vecsize(const Vector *v) { return v->size; }

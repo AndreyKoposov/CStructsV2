@@ -23,6 +23,9 @@ int main() {
     if (!CU_add_test(vectorS, "Push", test_push)) cleanup();
     if (!CU_add_test(vectorS, "Pop", test_pop)) cleanup();
     if (!CU_add_test(vectorS, "At", test_at)) cleanup();
+    if (!CU_add_test(vectorS, "Back", test_back)) cleanup();
+    if (!CU_add_test(vectorS, "Get", test_get)) cleanup();
+    if (!CU_add_test(vectorS, "Foreach", test_for)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();
