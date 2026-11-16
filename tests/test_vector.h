@@ -8,3 +8,6 @@ void test_at(void);
 void test_back(void);
 void test_get(void);
 void test_for(void);
+void test_insert(void);
+void test_erase(void);
+void test_erase_range(void);

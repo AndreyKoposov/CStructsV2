@@ -1,6 +1,6 @@
 CC := gcc
 CFLAGS := -Wall -Wextra -O2 -Wpedantic -Iinclude
-TFLAGS := -Wall -Wextra -O0 -Wpedantic -Iinclude -Itests
+TFLAGS := -Wall -Wextra -O0 -Wpedantic -Iinclude -Itests -g
 AR := ar
 ARFLAGS := rcs
 VFLAGS := valgrind --leak-check=full --track-origins=yes
@@ -17,13 +17,13 @@ test: lib $(BUILD)/test
 	$(VFLAGS) $(BUILD)/test
 
 $(BUILD)/test: $(BUILD)/test.o $(BUILD)/test_vector.o
-	$(CC) $(CFLAGS) $^ -Lbuild -lstructs -lcunit -o $@
+	$(CC) $(TFLAGS) $^ -Lbuild -lstructs -lcunit -o $@
 
 $(BUILD)/test.o: $(TESTS)/test.c
-	$(CC) $(CFLAGS) -c $^ -o $@
+	$(CC) $(TFLAGS) -c $^ -o $@
 
 $(BUILD)/test_vector.o: $(TESTS)/test_vector.c
-	$(CC) $(CFLAGS) -c $^ -o $@
+	$(CC) $(TFLAGS) -c $^ -o $@
 
 # === Lib ===
 lib: $(BUILD)/libstructs.a

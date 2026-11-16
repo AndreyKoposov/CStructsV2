@@ -239,6 +239,7 @@ void test_back(void) {
 void test_get(void) {
     // Arrange
     Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
     int a = 2;
     vecpush(v1, &a);
 
@@ -247,12 +248,17 @@ void test_get(void) {
     vecget(v1, 0, &out);
     out = 4;
 
+    int out2 = 0;
+    int status = vecget(v2, 0, &out2);
+
     // Assert
     int* p = (int*)vecat(v1, 0);
     CU_ASSERT_EQUAL(*p, a);
+    CU_ASSERT_EQUAL(status, -1);
 
     // Clean up
     vecdes(v1);
+    vecdes(v2);
 }
 
 static void add(void* el, void* ctx) {
@@ -284,3 +290,104 @@ void test_for(void) {
     vecdes(v1);
 }
 
+void test_insert(void) {
+    // Arrange
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
+    int a = 2;
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    
+    // Act
+    a = 3;
+    int status1 = vecinsert(v1, 0, &a);
+    int status2 = vecinsert(v1, 1, &a);
+    int status3 = vecinsert(v1, vecsize(v1), &a);
+    int status4 = vecinsert(v2, 10, &a);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, 0);
+    CU_ASSERT_EQUAL(status3, 0);
+    CU_ASSERT_EQUAL(status4, -1);
+
+    CU_ASSERT_EQUAL(*(int*)vecat(v1, 0), 3);
+    CU_ASSERT_EQUAL(*(int*)vecat(v1, 1), 3);
+    CU_ASSERT_EQUAL(*(int*)vecat(v1, 2), 2);
+    CU_ASSERT_EQUAL(*(int*)vecat(v1, 3), 2);
+    CU_ASSERT_EQUAL(*(int*)vecat(v1, 4), 2);
+    CU_ASSERT_EQUAL(*(int*)vecat(v1, 5), 3);
+
+    // Clean up
+    vecdes(v1);
+    vecdes(v2);
+}
+
+void test_erase(void) {
+    // Arrange
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
+    int a = 2;
+    int b = 3;
+    vecpush(v1, &a);
+    vecpush(v1, &b);
+    vecpush(v1, &a);
+    
+    // Act
+    int status1 = vecerase(v1, 1);
+    int status2 = vecerase(v2, 15);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(vecsize(v1), 2);
+
+    CU_ASSERT_EQUAL(*(int*)vecat(v1, 0), a);
+    CU_ASSERT_EQUAL(*(int*)vecat(v1, 1), a);
+
+    CU_ASSERT_EQUAL(status2, -1);
+
+    // Clean up
+    vecdes(v1);
+    vecdes(v2);
+}
+
+void test_erase_range(void) {
+    // Arrange
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
+    Vector* v3 = vector(sizeof(int));
+    int a = 2;
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+
+    vecpush(v2, &a);
+    vecpush(v2, &a);
+    vecpush(v2, &a);
+    
+    // Act
+    int status1 = veceraser(v1, 1, 3);
+    int status2 = veceraser(v2, 1, 3);
+    int status3 = veceraser(v3, 2, 5);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(vecsize(v1), 3);
+
+    CU_ASSERT_EQUAL(*(int*)vecat(v1, 0), a);
+    CU_ASSERT_EQUAL(*(int*)vecat(v1, vecsize(v1)-1), a);
+
+    CU_ASSERT_EQUAL(status2, 0);
+    CU_ASSERT_EQUAL(vecsize(v2), 1);
+    CU_ASSERT_EQUAL(*(int*)vecat(v2, 0), a);
+
+    CU_ASSERT_EQUAL(status3, -1);
+
+    // Clean up
+    vecdes(v1);
+    vecdes(v2);
+    vecdes(v3);
+}

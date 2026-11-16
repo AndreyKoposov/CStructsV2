@@ -26,6 +26,9 @@ int main() {
     if (!CU_add_test(vectorS, "Back", test_back)) cleanup();
     if (!CU_add_test(vectorS, "Get", test_get)) cleanup();
     if (!CU_add_test(vectorS, "Foreach", test_for)) cleanup();
+    if (!CU_add_test(vectorS, "Insert", test_insert)) cleanup();
+    if (!CU_add_test(vectorS, "Erase", test_erase)) cleanup();
+    if (!CU_add_test(vectorS, "Erase range", test_erase_range)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();
