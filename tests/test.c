@@ -29,6 +29,10 @@ int main() {
     if (!CU_add_test(vectorS, "Insert", test_insert)) cleanup();
     if (!CU_add_test(vectorS, "Erase", test_erase)) cleanup();
     if (!CU_add_test(vectorS, "Erase range", test_erase_range)) cleanup();
+    if (!CU_add_test(vectorS, "Copy", test_copy)) cleanup();
+    if (!CU_add_test(vectorS, "Clone", test_clone)) cleanup();
+    if (!CU_add_test(vectorS, "Swap", test_swap)) cleanup();
+    if (!CU_add_test(vectorS, "Equals", test_equals)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();

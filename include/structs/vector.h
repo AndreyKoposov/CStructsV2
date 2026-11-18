@@ -25,5 +25,10 @@ void vecfor(Vector* v, void (*fn)(void* el, void* ctx), void* ctx);
 int vecinsert(Vector* v, size_t i, const void *el);
 int vecerase(Vector* v, size_t i);
 int veceraser(Vector* v, size_t first, size_t last);
+Vector* vecclone(Vector *src);
+int veccpy(Vector* dst, Vector* src);
+int vecswp(Vector* a, Vector* b);
+bool vecequ(Vector* a, Vector* b, bool (*eq)(void*, void*, void* ctx), void* ctx);
+void vecmove(Vector* dst, Vector* src);
 
 #endif

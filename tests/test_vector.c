@@ -391,3 +391,134 @@ void test_erase_range(void) {
     vecdes(v2);
     vecdes(v3);
 }
+
+void test_copy(void) {
+    // Arrange
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
+    Vector* v3 = vector(sizeof(int));
+    Vector* v4 = vector(sizeof(double));
+
+    int a = 2;
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+
+    int b = 3;
+    vecpush(v2, &b);
+    vecpush(v2, &b);
+    vecpush(v2, &b);
+    
+    // Act
+    int status1 = veccpy(v3, v1);
+    int status2 = veccpy(v4, v2);
+    int status3 = veccpy(NULL, v1);
+    int status4 = veccpy(v4, NULL);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, -1);
+    CU_ASSERT_EQUAL(status3, -1);
+    CU_ASSERT_EQUAL(status4, -1);
+
+    CU_ASSERT_EQUAL(*(int*)vecat(v3, 0), a);
+    CU_ASSERT_EQUAL(*(int*)vecat(v3, vecsize(v3)-1), a);
+
+    // Clean up
+    vecdes(v1);
+    vecdes(v2);
+    vecdes(v3);
+    vecdes(v4);
+}
+
+void test_clone(void) {
+    // Arrange
+    Vector* v1 = vector(sizeof(int));
+
+    int a = 2;
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    
+    // Act
+    Vector* clone = vecclone(v1);
+    vecpop(v1, NULL);
+
+    // Assert
+    CU_ASSERT_EQUAL(vecsize(clone), 3);
+
+    // Clean up
+    vecdes(v1);
+    vecdes(clone);
+}
+
+void test_swap(void) {
+    // Arrange
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(double));
+
+    int a = 2;
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+
+    double b = 2;
+    vecpush(v2, &b);
+    vecpush(v2, &b);
+    
+    // Act
+    int status = vecswp(v1, v2);
+    vecpop(v1, NULL);
+
+    // Assert
+    CU_ASSERT_EQUAL(status, 0);
+
+    CU_ASSERT_EQUAL(vecsize(v1), 1);
+    CU_ASSERT_EQUAL(vecsize(v2), 3);
+
+    // Clean up
+    vecdes(v1);
+    vecdes(v2);
+}
+
+static bool equals(void* el1, void* el2, void* ctx) {
+    int* a = el1;
+    int* b = el2;
+    (void)ctx;
+
+    return *a == *b;
+}
+
+void test_equals(void) {
+    // Arrange
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
+    Vector* v3 = vector(sizeof(int));
+
+    int a = 3;
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+
+    int b = 2;
+    vecpush(v2, &b);
+    vecpush(v2, &b);
+
+    int c = 3;
+    vecpush(v3, &c);
+    vecpush(v3, &c);
+    vecpush(v3, &c);
+    
+    // Act
+    bool res1 = vecequ(v1, v2, equals, NULL);
+    bool res2 = vecequ(v1, v3, equals, NULL);
+
+    // Assert
+    CU_ASSERT_EQUAL(res1, false);
+    CU_ASSERT_EQUAL(res2, true);
+
+    // Clean up
+    vecdes(v1);
+    vecdes(v2);
+    vecdes(v3);
+}

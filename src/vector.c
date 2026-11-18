@@ -186,6 +186,66 @@ int veceraser(Vector* v, size_t first, size_t last) {
     return 0;
 }
 
+Vector* vecclone(Vector *src) {
+    if (!src) return NULL;
+
+    Vector* out = vector(src->elem_size);
+    if (!out) return NULL;
+
+    if (vecres(out, src->size) == -1) return NULL;
+
+    memcpy(out->data, src->data, src->size * src->elem_size);
+    out->size = src->size;
+
+    return out;
+}
+
+int veccpy(Vector* dst, Vector* src) {
+    if (!dst || !src) return -1;
+    if (dst->elem_size != src->elem_size) return -1;
+    if (src->size > dst->capacity)
+        if (vecres(dst, src->size) == -1)
+            return -1;
+
+    memcpy(dst->data, src->data, src->size * src->elem_size);
+    dst->size = src->size;
+
+    return 0;
+}
+
+int vecswp(Vector* a, Vector* b) {
+    if (!a || !b) return -1;
+
+    size_t tmp_size = a->size;
+    void* tmp_data = a->data;
+    size_t tmp_cap = a->capacity;
+    size_t tmp_el = a->elem_size;
+
+    a->capacity = b->capacity;
+    a->size = b->size;
+    a->elem_size = b->elem_size;
+    a->data = b->data;
+
+    b->capacity = tmp_cap;
+    b->size = tmp_size;
+    b->elem_size = tmp_el;
+    b->data = tmp_data;
+
+    return 0;
+}
+
+bool vecequ(Vector* a, Vector* b, bool (*eq)(void*, void*, void* ctx), void* ctx) {
+    if (!a || !b) return false;
+    if (vecsize(a) != vecsize(b)) return false;
+    if (a->elem_size != b->elem_size) return false;
+
+    for (size_t i = 0; i < a->size; i++)
+        if (!eq(vecat(a, i), vecat(b, i), ctx))
+            return false;
+
+    return true;
+}
+
 size_t vecsize(Vector *v) { return v->size; }
 size_t veccap(Vector *v) { return v->capacity; }
 bool vecemp(Vector *v) { return v->size == 0; }

@@ -11,3 +11,7 @@ void test_for(void);
 void test_insert(void);
 void test_erase(void);
 void test_erase_range(void);
+void test_copy(void);
+void test_clone(void);
+void test_swap(void);
+void test_equals(void);
