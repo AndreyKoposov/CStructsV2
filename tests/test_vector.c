@@ -572,3 +572,44 @@ void test_move(void) {
     vecdes(v2);
     vecdes(v3);
 }
+
+int value(void* x, void* ctx) {
+    (void)ctx;
+    return *(int*)x;
+}
+
+void test_max_min(void) {
+    // Arrange
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
+
+    for (size_t i = 0; i < 10; i++) {
+        vecpush(v1, &i);
+    }
+    
+    // Act
+    int max;
+    size_t max_pos;
+    int status1 = vecmax(v1, value, NULL, &max, &max_pos);
+
+    int min;
+    size_t min_pos;
+    int status2 = vecmin(v1, value, NULL, &min, &min_pos);
+
+    int status3 = vecmin(v2, value, NULL, NULL, NULL);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, 0);
+    CU_ASSERT_EQUAL(status3, -1);
+
+    CU_ASSERT_EQUAL(max, 9);
+    CU_ASSERT_EQUAL(max_pos, 9);
+
+    CU_ASSERT_EQUAL(min, 0);
+    CU_ASSERT_EQUAL(min_pos, 0);
+
+    // Clean up
+    vecdes(v1);
+    vecdes(v2);
+}

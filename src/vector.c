@@ -263,6 +263,44 @@ int vecmove(Vector* dst, Vector* src) {
     return 0;
 }
 
+int vecmax(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i) {
+    if (!a || vecsize(a) < 1) return -1;
+
+    int max = value(vecat(a, 0), ctx);
+    int pos = 0;
+    for (size_t i = 1; i < vecsize(a); i++) {
+        int another = value(vecat(a, i), ctx);
+        if (another > max) {
+            max = another;
+            pos = i;
+        }
+    }
+
+    *out = max;
+    *i = pos;
+
+    return 0;
+}
+
+int vecmin(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i) {
+    if (!a || vecsize(a) < 1) return -1;
+
+    int min = value(vecat(a, 0), ctx);
+    int pos = 0;
+    for (size_t i = 1; i < vecsize(a); i++) {
+        int another = value(vecat(a, i), ctx);
+        if (another < min) {
+            min = another;
+            pos = i;
+        }
+    }
+
+    *out = min;
+    *i = pos;
+
+    return 0;
+}
+
 size_t vecsize(Vector *v) { return v->size; }
 size_t veccap(Vector *v) { return v->capacity; }
 bool vecemp(Vector *v) { return v->size == 0; }

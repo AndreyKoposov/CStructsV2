@@ -30,5 +30,7 @@ int veccpy(Vector* dst, Vector* src);
 int vecswp(Vector* a, Vector* b);
 bool vecequ(Vector* a, Vector* b, bool (*eq)(void*, void*, void* ctx), void* ctx);
 int vecmove(Vector* dst, Vector* src);
+int vecmax(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i);
+int vecmin(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i);
 
 #endif

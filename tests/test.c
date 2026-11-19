@@ -34,6 +34,7 @@ int main() {
     if (!CU_add_test(vectorS, "Swap", test_swap)) cleanup();
     if (!CU_add_test(vectorS, "Equals", test_equals)) cleanup();
     if (!CU_add_test(vectorS, "Move", test_move)) cleanup();
+    if (!CU_add_test(vectorS, "Max/Min", test_max_min)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();

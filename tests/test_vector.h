@@ -16,3 +16,4 @@ void test_clone(void);
 void test_swap(void);
 void test_equals(void);
 void test_move(void);
+void test_max_min(void);
