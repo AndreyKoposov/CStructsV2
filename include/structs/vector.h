@@ -29,6 +29,6 @@ Vector* vecclone(Vector *src);
 int veccpy(Vector* dst, Vector* src);
 int vecswp(Vector* a, Vector* b);
 bool vecequ(Vector* a, Vector* b, bool (*eq)(void*, void*, void* ctx), void* ctx);
-void vecmove(Vector* dst, Vector* src);
+int vecmove(Vector* dst, Vector* src);
 
 #endif

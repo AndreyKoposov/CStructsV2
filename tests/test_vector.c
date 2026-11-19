@@ -522,3 +522,53 @@ void test_equals(void) {
     vecdes(v2);
     vecdes(v3);
 }
+
+void test_move(void) {
+    // Arrange
+    Vector* v1 = vector(sizeof(int));
+    Vector* v2 = vector(sizeof(int));
+    Vector* v3 = vector(sizeof(int));
+
+    int a = 2;
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+    vecpush(v1, &a);
+
+    int b = 3;
+    vecpush(v2, &b);
+    vecpush(v2, &b);
+    size_t v2_cap = veccap(v2);
+
+    int c = 4;
+    vecpush(v3, &c);
+    vecpush(v3, &c);
+    vecpush(v3, &c);
+    vecpush(v3, &c);
+    size_t v3_cap = veccap(v3);
+    
+    // Act
+    int status1 = vecmove(v1, v2);
+    CU_ASSERT_EQUAL(veccap(v1), v2_cap);
+    vecpush(v1, &c);
+
+    CU_ASSERT_EQUAL(vecsize(v1), 3);
+    CU_ASSERT_EQUAL(vecsize(v2), 0);
+    CU_ASSERT_EQUAL(veccap(v2), 0);
+
+    int status2 = vecmove(v1, v3);
+    CU_ASSERT_EQUAL(veccap(v1), v3_cap);
+    vecpush(v1, &c);
+
+    CU_ASSERT_EQUAL(vecsize(v1), 5);
+    CU_ASSERT_EQUAL(vecsize(v3), 0);
+    CU_ASSERT_EQUAL(veccap(v3), 0);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, 0);
+
+    // Clean up
+    vecdes(v1);
+    vecdes(v2);
+    vecdes(v3);
+}

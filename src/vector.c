@@ -246,6 +246,23 @@ bool vecequ(Vector* a, Vector* b, bool (*eq)(void*, void*, void* ctx), void* ctx
     return true;
 }
 
+int vecmove(Vector* dst, Vector* src) {
+    if (!dst || !src) return -1;
+    if (dst->elem_size != src->elem_size) return -1;
+    if (dst == src) return 0;
+
+    free(dst->data);
+    dst->data = src->data;
+    dst->size = src->size;
+    dst->capacity = src->capacity;
+
+    src->size = 0;
+    src->capacity = 0;
+    src->data = NULL;
+
+    return 0;
+}
+
 size_t vecsize(Vector *v) { return v->size; }
 size_t veccap(Vector *v) { return v->capacity; }
 bool vecemp(Vector *v) { return v->size == 0; }

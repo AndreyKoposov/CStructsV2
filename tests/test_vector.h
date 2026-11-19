@@ -15,3 +15,4 @@ void test_copy(void);
 void test_clone(void);
 void test_swap(void);
 void test_equals(void);
+void test_move(void);
