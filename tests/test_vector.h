@@ -19,3 +19,4 @@ void test_move(void);
 void test_max_min(void);
 void test_sort(void);
 void test_from_to_array(void);
+void test_integration_1(void);

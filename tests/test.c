@@ -37,6 +37,7 @@ int main() {
     if (!CU_add_test(vectorS, "Max/Min", test_max_min)) cleanup();
     if (!CU_add_test(vectorS, "Sort", test_sort)) cleanup();
     if (!CU_add_test(vectorS, "From/To array", test_from_to_array)) cleanup();
+    if (!CU_add_test(vectorS, "Integration #1", test_integration_1)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();

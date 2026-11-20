@@ -655,3 +655,88 @@ void test_from_to_array(void) {
     vecdes(v2);
     free(arr2);
 }
+
+void test_integration_1(void) {
+    // Arrange
+    typedef struct custom {
+        int a;
+        char b;
+        double c;
+    } Custom;
+
+    Vector* vi = vector(sizeof(int));
+    Vector* vd = vector(sizeof(double));
+    Vector* vs = vector(sizeof(Custom));
+
+    int arr[] = {5,4,3,2,1,0};
+
+    // Act & Assert
+    CU_ASSERT_EQUAL(vecemp(vi), true);
+
+    CU_ASSERT_EQUAL(vecres(vd, 32), 0);
+    CU_ASSERT_EQUAL(veccap(vd), 32);
+    CU_ASSERT_EQUAL(vecsize(vd), 0);
+    
+    Vector* vi2 = vecfromarr(arr, 6, sizeof(int));
+    CU_ASSERT_EQUAL(vecsort(vi2, value, NULL), 0);
+
+    int* front = vecfront(vi2);
+    int* back = vecback(vi2);
+
+    CU_ASSERT_EQUAL(*front, 0);
+    CU_ASSERT_EQUAL(*back, 5);
+
+    int max, min;
+    size_t i_max, i_min;
+    CU_ASSERT_EQUAL(vecmax(vi2, value, NULL, &max, &i_max), 0);
+    CU_ASSERT_EQUAL(vecmin(vi2, value, NULL, &min, &i_min), 0);
+
+    CU_ASSERT_EQUAL(*front, min);
+    CU_ASSERT_EQUAL(*back, max);
+    CU_ASSERT_EQUAL(i_max, 5);
+    CU_ASSERT_EQUAL(i_min, 0);
+
+    for (int i = 0; i < 6; i++)
+        vecpush(vi, &arr[i]);
+
+    vecerase(vi, 1);
+    int* second = vecat(vi, 1);
+
+    CU_ASSERT_EQUAL(*second, 3);
+
+    double dbl = 0.3f;
+    vecpush(vd, &dbl);
+    vecpush(vd, &dbl);
+    vecpush(vd, &dbl);
+    vecpush(vd, &dbl);
+
+    double out;
+    vecget(vd, 3, &out);
+
+    CU_ASSERT_DOUBLE_EQUAL(dbl, out, 0.01);
+    out = 4;
+    CU_ASSERT_DOUBLE_EQUAL(*(double*)vecat(vd, 3), dbl, 0.01);
+
+    veceraser(vd, 1, 3);
+    CU_ASSERT_EQUAL(vecsize(vd), 2);
+
+    Custom s1 = {0, 1, 2};
+    vecpush(vs, &s1);
+    vecpush(vs, &s1);
+    vecpush(vs, &s1);
+
+    CU_ASSERT_EQUAL(vecsize(vs), 3);
+
+    Custom s2;
+    vecpop(vs, &s2);
+
+    CU_ASSERT_EQUAL(s2.a, 0);
+    CU_ASSERT_EQUAL(s2.b, 1);
+    CU_ASSERT_DOUBLE_EQUAL(s2.c, 2, 0.01);
+
+    // Clean up
+    vecdes(vi);
+    vecdes(vd);
+    vecdes(vs);
+    vecdes(vi2);
+}
