@@ -4,6 +4,10 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 typedef struct vector Vector;
 
@@ -63,5 +67,10 @@ int vecsort(Vector* a, int (*value)(void*, void* ctx), void* ctx);
 Vector* vecfromarr(void* arr, size_t len, size_t el_size);
 // Возвращает указатель на массив с данными вектора a
 void* vectoarr(Vector* a);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

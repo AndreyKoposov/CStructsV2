@@ -1,23 +1,32 @@
-CC := gcc
-CFLAGS := -Wall -Wextra -O2 -Wpedantic -Iinclude
-TFLAGS := -Wall -Wextra -O0 -Wpedantic -Iinclude -Itests -g
-AR := ar
+CC 		?= gcc
+CFLAGS  ?= -Wall -Wextra -O2 -Wpedantic -Iinclude
+TFLAGS  := -Wall -Wextra -O0 -Wpedantic -Iinclude -Itests -g
+AR 		:= ar
 ARFLAGS := rcs
-VFLAGS := valgrind --leak-check=full --track-origins=yes
+VFLAGS 	:= valgrind --leak-check=full --track-origins=yes
 
-SRC := src
-TESTS := tests
-BUILD := build
+SRC 	:= src
+TESTS   := tests
+BUILD   := build
+EXAMPLE := examples
+LIB  	:= libcstructs.a
+INC 	:= include/structs/
+HDR 	:= vector.h
+
+PREFIX  ?= /usr/local
+LIBDIR  ?= $(PREFIX)/lib
+INCDIR  ?= $(PREFIX)/include
+DESTDIR ?= 
 
 
-.PHONY: lib test clean 
+.PHONY: lib test clean example install uninstall
 
 # === Tests ===
 test: lib $(BUILD)/test
 	$(VFLAGS) $(BUILD)/test
 
 $(BUILD)/test: $(BUILD)/test.o $(BUILD)/test_vector.o
-	$(CC) $(TFLAGS) $^ -Lbuild -lstructs -lcunit -o $@
+	$(CC) $(TFLAGS) $^ -Lbuild -lcstructs -lcunit -o $@
 
 $(BUILD)/test.o: $(TESTS)/test.c
 	$(CC) $(TFLAGS) -c $^ -o $@
@@ -26,13 +35,34 @@ $(BUILD)/test_vector.o: $(TESTS)/test_vector.c
 	$(CC) $(TFLAGS) -c $^ -o $@
 
 # === Lib ===
-lib: $(BUILD)/libstructs.a
+lib: $(BUILD)/${LIB}
 
-$(BUILD)/libstructs.a: $(BUILD)/vector.o
+$(BUILD)/${LIB}: $(BUILD)/vector.o
 	$(AR) $(ARFLAGS) $@ $^
 
 $(BUILD)/vector.o: $(SRC)/vector.c
 	$(CC) $(CFLAGS) -c $^ -o $@
+
+# === Example ===
+example: $(BUILD)/vector_example
+	$(BUILD)/vector_example
+
+$(BUILD)/vector_example: ${BUILD}/example_vector.o
+	$(CC) ${CFLAGS} $^ -lcstructs -o $@
+
+${BUILD}/example_vector.o: ${EXAMPLE}/vector.c
+	$(CC) ${CFLAGS} -c $^ -o $@
+
+# === Installation ===
+install: lib
+	install -d $(DESTDIR)$(LIBDIR) $(DESTDIR)$(INCDIR)
+	install -m 644 $(BUILD)/$(LIB) $(DESTDIR)$(LIBDIR)/
+	install -m 644 $(INC)/$(HDR) $(DESTDIR)$(INCDIR)/
+
+# === Uninstall ===
+uninstall:
+	rm -f $(DESTDIR)$(LIBDIR)/$(LIB)
+	rm -f $(DESTDIR)$(INCDIR)/vector.h
 
 # === Clean up ===
 clean:
