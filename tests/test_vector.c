@@ -573,7 +573,7 @@ void test_move(void) {
     vecdes(v3);
 }
 
-int value(void* x, void* ctx) {
+static int value(void* x, void* ctx) {
     (void)ctx;
     return *(int*)x;
 }
@@ -656,7 +656,7 @@ void test_from_to_array(void) {
     free(arr2);
 }
 
-void test_integration_1(void) {
+void test_different_types(void) {
     // Arrange
     typedef struct custom {
         int a;
@@ -740,3 +740,102 @@ void test_integration_1(void) {
     vecdes(vs);
     vecdes(vi2);
 }
+
+void test_basic_lifecycle(void)
+{
+    Vector *v = vector(sizeof(int));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(v);
+
+    CU_ASSERT_EQUAL(vecsize(v), 0);
+    CU_ASSERT_TRUE(vecemp(v));
+    CU_ASSERT_EQUAL(veccap(v), 0);
+
+    CU_ASSERT_EQUAL(vecres(v, 8), 0);
+    CU_ASSERT_EQUAL(veccap(v), 8);
+    CU_ASSERT_EQUAL(vecsize(v), 0);
+
+    int a = 10, b = 20, c = 30;
+    CU_ASSERT_EQUAL(vecpush(v, &a), 0);
+    CU_ASSERT_EQUAL(vecpush(v, &b), 0);
+    CU_ASSERT_EQUAL(vecpush(v, &c), 0);
+
+    CU_ASSERT_EQUAL(vecsize(v), 3);
+    CU_ASSERT_FALSE(vecemp(v));
+
+    /* front / back / at */
+    CU_ASSERT_EQUAL(*(int *)vecfront(v), 10);
+    CU_ASSERT_EQUAL(*(int *)vecback(v), 30);
+    CU_ASSERT_EQUAL(*(int *)vecat(v, 1), 20);
+
+    /* get */
+    int out = 0;
+    CU_ASSERT_EQUAL(vecget(v, 2, &out), 0);
+    CU_ASSERT_EQUAL(out, 30);
+
+    /* pop */
+    out = 0;
+    CU_ASSERT_EQUAL(vecpop(v, &out), 0);
+    CU_ASSERT_EQUAL(out, 30);
+    CU_ASSERT_EQUAL(vecsize(v), 2);
+
+    /* shrink */
+    CU_ASSERT_EQUAL(vecshr(v), 0);
+    CU_ASSERT_EQUAL(veccap(v), 2);
+    CU_ASSERT_EQUAL(vecsize(v), 2);
+
+    /* clear */
+    veccle(v);
+    CU_ASSERT_TRUE(vecemp(v));
+    CU_ASSERT_EQUAL(vecsize(v), 0);
+
+    vecdes(v);
+}
+
+static void sum_int(void *el, void *ctx)
+{
+    int *acc = (int *)ctx;
+    *acc += *(int *)el;
+}
+
+void test_modifications(void)
+{
+    Vector *v = vector(sizeof(int));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(v);
+
+    for (int i = 0; i < 5; ++i)
+        CU_ASSERT_EQUAL(vecpush(v, &i), 0);
+
+    /* sum via vecfor */
+    int acc = 0;
+    vecfor(v, sum_int, &acc);
+    CU_ASSERT_EQUAL(acc, 0 + 1 + 2 + 3 + 4);
+
+    /* insert в начало */
+    int neg = -1;
+    CU_ASSERT_EQUAL(vecinsert(v, 0, &neg), 0);
+    CU_ASSERT_EQUAL(vecsize(v), 6);
+    CU_ASSERT_EQUAL(*(int *)vecfront(v), -1);
+
+    /* insert в середину */
+    int x = 100;
+    CU_ASSERT_EQUAL(vecinsert(v, 3, &x), 0);
+    CU_ASSERT_EQUAL(vecsize(v), 7);
+    CU_ASSERT_EQUAL(*(int *)vecat(v, 3), 100);
+
+    /* erase одного элемента */
+    CU_ASSERT_EQUAL(vecerase(v, 3), 0);
+    CU_ASSERT_EQUAL(vecsize(v), 6);
+    CU_ASSERT_EQUAL(*(int *)vecat(v, 3), 2);
+
+    /* erase диапазона [1, 3) */
+    CU_ASSERT_EQUAL(veceraser(v, 1, 3), 0);
+    CU_ASSERT_EQUAL(vecsize(v), 4);
+    /* после удаления: [-1, 2, 3, 4] */
+    CU_ASSERT_EQUAL(*(int *)vecat(v, 0), -1);
+    CU_ASSERT_EQUAL(*(int *)vecat(v, 1), 2);
+    CU_ASSERT_EQUAL(*(int *)vecat(v, 2), 3);
+    CU_ASSERT_EQUAL(*(int *)vecat(v, 3), 4);
+
+    vecdes(v);
+}
+

@@ -36,5 +36,5 @@ $(BUILD)/vector.o: $(SRC)/vector.c
 
 # === Clean up ===
 clean:
-	rm -r $(BUILD) & mkdir -p build
+	rm -r $(BUILD) ; mkdir -p build
 

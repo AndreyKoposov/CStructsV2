@@ -19,4 +19,6 @@ void test_move(void);
 void test_max_min(void);
 void test_sort(void);
 void test_from_to_array(void);
-void test_integration_1(void);
+void test_different_types(void);
+void test_basic_lifecycle(void);
+void test_modifications(void);
