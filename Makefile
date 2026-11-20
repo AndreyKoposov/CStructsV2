@@ -10,16 +10,9 @@ TESTS   := tests
 BUILD   := build
 EXAMPLE := examples
 LIB  	:= libcstructs.a
-INC 	:= include/structs/
-HDR 	:= vector.h
-
-PREFIX  ?= /usr/local
-LIBDIR  ?= $(PREFIX)/lib
-INCDIR  ?= $(PREFIX)/include
-DESTDIR ?= 
 
 
-.PHONY: lib test clean example install uninstall
+.PHONY: lib test clean example
 
 # === Tests ===
 test: lib $(BUILD)/test
@@ -48,21 +41,10 @@ example: $(BUILD)/vector_example
 	$(BUILD)/vector_example
 
 $(BUILD)/vector_example: ${BUILD}/example_vector.o
-	$(CC) ${CFLAGS} $^ -lcstructs -o $@
+	$(CC) ${CFLAGS} $^ -L${BUILD} -lcstructs -o $@
 
 ${BUILD}/example_vector.o: ${EXAMPLE}/vector.c
 	$(CC) ${CFLAGS} -c $^ -o $@
-
-# === Installation ===
-install: lib
-	install -d $(DESTDIR)$(LIBDIR) $(DESTDIR)$(INCDIR)
-	install -m 644 $(BUILD)/$(LIB) $(DESTDIR)$(LIBDIR)/
-	install -m 644 $(INC)/$(HDR) $(DESTDIR)$(INCDIR)/
-
-# === Uninstall ===
-uninstall:
-	rm -f $(DESTDIR)$(LIBDIR)/$(LIB)
-	rm -f $(DESTDIR)$(INCDIR)/vector.h
 
 # === Clean up ===
 clean:
