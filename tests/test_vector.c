@@ -964,3 +964,105 @@ void test_array_conversions(void)
     free(out2);
     vecdes(v);
 }
+
+void test_error_paths(void)
+{
+    Vector *v = vector(sizeof(int));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(v);
+
+    int x = 1, out = 0;
+
+    /* pop из пустого */
+    CU_ASSERT_NOT_EQUAL(vecpop(v, &out), 0);
+
+    /* get/at вне диапазона не должны крашить в тесте — просто проверим статус get */
+    CU_ASSERT_NOT_EQUAL(vecget(v, 0, &out), 0);
+
+    /* insert за пределы */
+    CU_ASSERT_NOT_EQUAL(vecinsert(v, 5, &x), 0);
+
+    /* erase несуществующего */
+    CU_ASSERT_NOT_EQUAL(vecerase(v, 0), 0);
+
+    /* erase диапазона с некорректными границами */
+    CU_ASSERT_EQUAL(vecpush(v, &x), 0);
+    CU_ASSERT_NOT_EQUAL(veceraser(v, 0, 5), 0);
+    CU_ASSERT_NOT_EQUAL(veceraser(v, 1, 0), 0);
+
+    /* equal с разной длиной */
+    Vector *w = vector(sizeof(int));
+    CU_ASSERT_EQUAL(vecpush(w, &x), 0);
+    CU_ASSERT_EQUAL(vecpush(w, &x), 0);
+    CU_ASSERT_FALSE(vecequ(v, w, eq_int, NULL));
+
+    /* max/min на пустом */
+    int maxv; size_t maxi;
+    CU_ASSERT_EQUAL(vecmax(w, value_int, NULL, &maxv, &maxi), 0);
+    /* w не пуст — но проверим пустой случай отдельно */
+    Vector *e = vector(sizeof(int));
+    CU_ASSERT_NOT_EQUAL(vecmax(e, value_int, NULL, &maxv, &maxi), 0);
+    CU_ASSERT_NOT_EQUAL(vecmin(e, value_int, NULL, &maxv, &maxi), 0);
+    vecdes(e);
+
+    vecdes(v);
+    vecdes(w);
+}
+
+void test_end_to_end(void)
+{
+    /* "история транзакций": накапливаем, фильтруем, сортируем */
+    int initial[] = { 10, -5, 7, 0, 3, -1, 8 };
+    Vector *log = vecfromarr(initial, 7, sizeof(int));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(log);
+
+    /* добавим ещё транзакций */
+    int more[] = { 4, -2, 6 };
+    for (int i = 0; i < 3; ++i)
+        CU_ASSERT_EQUAL(vecpush(log, &more[i]), 0);
+
+    /* удалим диапазон [-5 ... 0) — то есть элементы 1..3 */
+    CU_ASSERT_EQUAL(veceraser(log, 1, 4), 0);
+    CU_ASSERT_EQUAL(vecsize(log), 7);   /* [10, 3, -1, 8, 4, -2, 6] */
+
+    /* Пересчитаем ожидание: исходно 7 элементов,
+       push 3 => 10, erase 3 => 7 */
+    CU_ASSERT_EQUAL(vecsize(log), 7);
+
+    /* сумму всех значений */
+    int total = 0;
+    vecfor(log, sum_int, &total);
+
+    /* отфильтруем отрицательные через pop-подобный цикл с конца */
+    for (size_t i = vecsize(log); i > 0; --i) {
+        int cur;
+        CU_ASSERT_EQUAL(vecget(log, i - 1, &cur), 0);
+        if (cur < 0)
+            CU_ASSERT_EQUAL(vecerase(log, i - 1), 0);
+    }
+
+    /* теперь все >= 0 */
+    for (size_t i = 0; i < vecsize(log); ++i)
+        CU_ASSERT_TRUE(*(int *)vecat(log, i) >= 0);
+
+    /* сортировка */
+    CU_ASSERT_EQUAL(vecsort(log, value_int, NULL), 0);
+
+    /* проверка монотонности */
+    for (size_t i = 1; i < vecsize(log); ++i) {
+        int prev, cur;
+        CU_ASSERT_EQUAL(vecget(log, i - 1, &prev), 0);
+        CU_ASSERT_EQUAL(vecget(log, i, &cur), 0);
+        CU_ASSERT_TRUE(prev <= cur);
+    }
+
+    /* клонируем и сравниваем */
+    Vector *snapshot = vecclone(log);
+    CU_ASSERT_TRUE(vecequ(log, snapshot, eq_int, NULL));
+
+    /* сжимаем память */
+    CU_ASSERT_EQUAL(vecshr(log), 0);
+    CU_ASSERT_EQUAL(veccap(log), vecsize(log));
+
+    vecdes(snapshot);
+    vecdes(log);
+}

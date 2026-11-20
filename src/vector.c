@@ -182,7 +182,7 @@ int vecerase(Vector* v, size_t i) {
 
 int veceraser(Vector* v, size_t first, size_t last) {
     if (!v) return -1;
-    if (first >= v->size || first >= last) return -1;
+    if (first >= v->size || first >= last || last > v->size) return -1;
 
     if (last < v->size)
         memmove(_vec_elem_ptr(v, first), _vec_elem_ptr(v, last), (last - first + 1) * v->elem_size);

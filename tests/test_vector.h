@@ -25,3 +25,5 @@ void test_modifications(void);
 void test_copy_semantics(void);
 void test_min_max_sort(void);
 void test_array_conversions(void);
+void test_error_paths(void);
+void test_end_to_end(void);
