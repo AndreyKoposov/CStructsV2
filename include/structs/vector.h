@@ -32,5 +32,8 @@ bool vecequ(Vector* a, Vector* b, bool (*eq)(void*, void*, void* ctx), void* ctx
 int vecmove(Vector* dst, Vector* src);
 int vecmax(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i);
 int vecmin(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i);
+int vecsort(Vector* a, int (*value)(void*, void* ctx), void* ctx);
+Vector* vecfromarr(void* arr, size_t len, size_t el_size);
+void* vectoarr(Vector* a);
 
 #endif

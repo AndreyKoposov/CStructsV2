@@ -613,3 +613,45 @@ void test_max_min(void) {
     vecdes(v1);
     vecdes(v2);
 }
+
+void test_sort(void) {
+    // Arrange
+    Vector* v1 = vector(sizeof(int));
+    
+    int arr[] = {3,2,31,4,7,9};
+    int sorted[] = {2,3,4,7,9,31};
+    for (size_t i = 0; i < 6; i++) {
+        vecpush(v1, &arr[i]);
+    }
+    
+    // Act
+    int status = vecsort(v1, value, NULL);
+
+    // Assert
+    CU_ASSERT_EQUAL(status, 0);
+    for (size_t i = 0; i < 6; i++) {
+        CU_ASSERT_EQUAL(*(int*)vecat(v1, i), sorted[i]);
+    }
+
+    // Clean up
+    vecdes(v1);
+}
+
+void test_from_to_array(void) {
+    // Arrange
+    int arr[] = {3,2,31,4,7,9};
+
+    // Act
+    Vector* v2 = vecfromarr(arr, 6, sizeof(int));
+    int* arr2 = vectoarr(v2);
+
+    // Assert
+    for (int i = 0; i < 6; i++) {
+        CU_ASSERT_EQUAL(arr[i], arr2[i]);
+        CU_ASSERT_EQUAL(arr[i], *(int*)vecat(v2, i))
+    }
+
+    // Clean up
+    vecdes(v2);
+    free(arr2);
+}

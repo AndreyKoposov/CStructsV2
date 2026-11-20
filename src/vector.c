@@ -45,6 +45,10 @@ static inline void* _vec_elem_ptr(Vector *v, size_t i) {
     return (char *)v->data + i * v->elem_size;
 }
 
+static inline void* _arr_elem_ptr(void* arr, size_t i, size_t el_size) {
+    return (char *)arr + i * el_size;
+}
+
 Vector* vector(size_t elem_size) {
     if (elem_size == 0) return NULL;
 
@@ -264,7 +268,7 @@ int vecmove(Vector* dst, Vector* src) {
 }
 
 int vecmax(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i) {
-    if (!a || vecsize(a) < 1) return -1;
+    if (!a || !value || vecsize(a) < 1) return -1;
 
     int max = value(vecat(a, 0), ctx);
     int pos = 0;
@@ -283,7 +287,7 @@ int vecmax(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_
 }
 
 int vecmin(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i) {
-    if (!a || vecsize(a) < 1) return -1;
+    if (!a || !value || vecsize(a) < 1) return -1;
 
     int min = value(vecat(a, 0), ctx);
     int pos = 0;
@@ -299,6 +303,79 @@ int vecmin(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_
     *i = pos;
 
     return 0;
+}
+
+static void _swap(void* a, void* b, size_t el_s) {
+    char* A = (char*)a;
+    char* B = (char*)b;
+    char C[el_s];
+
+    memcpy(C, A, el_s);
+    memcpy(A, B, el_s);
+    memcpy(B, C, el_s);
+}
+
+static size_t _partition(void* arr, size_t low, size_t high, size_t el_s,
+                         int (*value)(void*, void* ctx), void* ctx) {
+    void* element = _arr_elem_ptr(arr, high, el_s);
+    int pivot = value(element, ctx);
+    size_t i = low;
+
+    for (size_t j = low; j < high; j++) {
+        void* arr_j = _arr_elem_ptr(arr, j, el_s);
+        if (value(arr_j, ctx) < pivot) {
+            void* arr_i = _arr_elem_ptr(arr, i, el_s);
+            _swap(arr_i, arr_j, el_s);
+            i++;
+        }
+    }
+    void* arr_i = _arr_elem_ptr(arr, i, el_s);
+    void* arr_high = _arr_elem_ptr(arr, high, el_s);
+    _swap(arr_i, arr_high, el_s);
+    return i;
+}
+
+static void _quick_sort(void* arr, size_t low, size_t high, size_t el_s,
+                        int (*value)(void*, void* ctx), void* ctx) {
+    if (low < high) {
+        size_t pi = _partition(arr, low, high, el_s, value, ctx);
+        if (pi > low)
+            _quick_sort(arr, low, pi - 1, el_s, value, ctx);
+        _quick_sort(arr, pi + 1, high, el_s, value, ctx);
+    }
+}
+
+int vecsort(Vector* a, int (*value)(void*, void* ctx), void* ctx) {
+    if (!a || !value) return -1;
+
+    _quick_sort(a->data, 0, a->size-1, a->elem_size, value, ctx);
+
+    return 0;
+}
+
+Vector* vecfromarr(void* arr, size_t len, size_t el_size) {
+    if (!arr) return NULL;
+
+    Vector* a = vector(el_size);
+    a->elem_size = el_size;
+    a->size = len;
+    if (vecres(a, len) == -1) {
+        vecdes(a);
+        return NULL;
+    }
+    memcpy(a->data, arr, len*el_size);
+
+    return a;
+}
+
+void* vectoarr(Vector* a) {
+    if (!a) return NULL;
+
+    void* arr = malloc(a->size*a->elem_size);
+    if (!arr) return NULL;
+    memcpy(arr, a->data, a->size*a->elem_size);
+
+    return arr;
 }
 
 size_t vecsize(Vector *v) { return v->size; }
