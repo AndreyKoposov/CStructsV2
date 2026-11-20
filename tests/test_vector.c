@@ -839,3 +839,128 @@ void test_modifications(void)
     vecdes(v);
 }
 
+static bool eq_int(void *a, void *b, void *ctx)
+{
+    (void)ctx;
+    return *(int *)a == *(int *)b;
+}
+
+void test_copy_semantics(void)
+{
+    Vector *a = vector(sizeof(int));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(a);
+
+    for (int i = 0; i < 4; ++i)
+        CU_ASSERT_EQUAL(vecpush(a, &i), 0);
+
+    /* clone */
+    Vector *b = vecclone(a);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(b);
+    CU_ASSERT_EQUAL(vecsize(b), vecsize(a));
+    CU_ASSERT_TRUE(vecequ(a, b, eq_int, NULL));
+
+    /* copy */
+    Vector *c = vector(sizeof(int));
+    CU_ASSERT_EQUAL(veccpy(c, a), 0);
+    CU_ASSERT_TRUE(vecequ(a, c, eq_int, NULL));
+
+    /* swap: a и b станут разными после изменения a */
+    CU_ASSERT_EQUAL(vecswp(a, c), 0);
+    CU_ASSERT_TRUE(vecequ(a, b, eq_int, NULL));
+    CU_ASSERT_TRUE(vecequ(c, b, eq_int, NULL));
+
+    /* move */
+    Vector *d = vector(sizeof(int));
+    CU_ASSERT_EQUAL(vecmove(d, a), 0);
+    CU_ASSERT_TRUE(vecequ(d, b, eq_int, NULL));
+    /* src после move должен быть пустым */
+    CU_ASSERT_TRUE(vecemp(a));
+
+    /* изменяем d и проверяем, что b не затронут */
+    int z = 999;
+    CU_ASSERT_EQUAL(vecpush(d, &z), 0);
+    CU_ASSERT_FALSE(vecequ(d, b, eq_int, NULL));
+
+    vecdes(a);
+    vecdes(b);
+    vecdes(c);
+    vecdes(d);
+}
+
+static int value_int(void *el, void *ctx)
+{
+    (void)ctx;
+    return *(int *)el;
+}
+
+void test_min_max_sort(void)
+{
+    Vector *v = vector(sizeof(int));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(v);
+
+    int data[] = { 42, -7, 13, 0, 99, 13 };
+    for (size_t i = 0; i < sizeof(data) / sizeof(data[0]); ++i)
+        CU_ASSERT_EQUAL(vecpush(v, &data[i]), 0);
+
+    /* max */
+    int maxv = 0;
+    size_t maxi = (size_t)-1;
+    CU_ASSERT_EQUAL(vecmax(v, value_int, NULL, &maxv, &maxi), 0);
+    CU_ASSERT_EQUAL(maxv, 99);
+    CU_ASSERT_EQUAL(maxi, 4);
+
+    /* min */
+    int minv = 0;
+    size_t mini = (size_t)-1;
+    CU_ASSERT_EQUAL(vecmin(v, value_int, NULL, &minv, &mini), 0);
+    CU_ASSERT_EQUAL(minv, -7);
+    CU_ASSERT_EQUAL(mini, 1);
+
+    /* sort */
+    CU_ASSERT_EQUAL(vecsort(v, value_int, NULL), 0);
+    int expected[] = { -7, 0, 13, 13, 42, 99 };
+    for (size_t i = 0; i < sizeof(expected) / sizeof(expected[0]); ++i)
+        CU_ASSERT_EQUAL(*(int *)vecat(v, i), expected[i]);
+
+    /* после сортировки min/max на краях */
+    CU_ASSERT_EQUAL(vecmin(v, value_int, NULL, &minv, &mini), 0);
+    CU_ASSERT_EQUAL(mini, 0);
+    CU_ASSERT_EQUAL(vecmax(v, value_int, NULL, &maxv, &maxi), 0);
+    CU_ASSERT_EQUAL(maxi, 5);
+
+    vecdes(v);
+}
+
+void test_array_conversions(void)
+{
+    int arr[] = { 5, 4, 3, 2, 1 };
+
+    Vector *v = vecfromarr(arr, 5, sizeof(int));
+    CU_ASSERT_PTR_NOT_NULL_FATAL(v);
+    CU_ASSERT_EQUAL(vecsize(v), 5);
+    CU_ASSERT_EQUAL(*(int *)vecat(v, 0), 5);
+    CU_ASSERT_EQUAL(*(int *)vecat(v, 4), 1);
+
+    /* модификация исходного массива не должна влиять (глубокая копия) */
+    arr[0] = 100;
+    CU_ASSERT_EQUAL(*(int *)vecat(v, 0), 5);
+
+    /* toarr должен вернуть массив с данными вектора */
+    void *raw = vectoarr(v);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(raw);
+    int *out = (int *)raw;
+    CU_ASSERT_EQUAL(out[0], 5);
+    CU_ASSERT_EQUAL(out[4], 1);
+
+    /* сортируем и снова извлекаем */
+    CU_ASSERT_EQUAL(vecsort(v, value_int, NULL), 0);
+    void *raw2 = vectoarr(v);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(raw2);
+    int *out2 = (int *)raw2;
+    for (int i = 0; i < 5; ++i)
+        CU_ASSERT_EQUAL(out2[i], i + 1);
+
+    free(out);
+    free(out2);
+    vecdes(v);
+}

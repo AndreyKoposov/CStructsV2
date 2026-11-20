@@ -40,6 +40,9 @@ int main() {
     if (!CU_add_test(vectorS, "Different types", test_different_types)) cleanup();
     if (!CU_add_test(vectorS, "Basic lifecycle", test_basic_lifecycle)) cleanup();
     if (!CU_add_test(vectorS, "Modifications", test_modifications)) cleanup();
+    if (!CU_add_test(vectorS, "Copy semantics", test_copy_semantics)) cleanup();
+    if (!CU_add_test(vectorS, "Min/Max/Sort", test_min_max_sort)) cleanup();
+    if (!CU_add_test(vectorS, "Array conversations", test_array_conversions)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
     CU_basic_run_tests();

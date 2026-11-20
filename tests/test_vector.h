@@ -22,3 +22,6 @@ void test_from_to_array(void);
 void test_different_types(void);
 void test_basic_lifecycle(void);
 void test_modifications(void);
+void test_copy_semantics(void);
+void test_min_max_sort(void);
+void test_array_conversions(void);
