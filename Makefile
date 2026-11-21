@@ -16,9 +16,9 @@ LIB  	:= libcstructs.a
 
 # === Tests ===
 test: lib $(BUILD)/test
-	$(VFLAGS) $(BUILD)/test
+	$(VFLAGS) $(BUILD)/test $(ARGS)
 
-$(BUILD)/test: $(BUILD)/test.o $(BUILD)/test_vector.o
+$(BUILD)/test: $(BUILD)/test.o $(BUILD)/test_vector.o $(BUILD)/test_btree.o
 	$(CC) $(TFLAGS) $^ -Lbuild -lcstructs -lcunit -o $@
 
 $(BUILD)/test.o: $(TESTS)/test.c
@@ -27,13 +27,19 @@ $(BUILD)/test.o: $(TESTS)/test.c
 $(BUILD)/test_vector.o: $(TESTS)/test_vector.c
 	$(CC) $(TFLAGS) -c $^ -o $@
 
+$(BUILD)/test_btree.o: $(TESTS)/test_btree.c
+	$(CC) $(TFLAGS) -c $^ -o $@
+
 # === Lib ===
 lib: $(BUILD)/${LIB}
 
-$(BUILD)/${LIB}: $(BUILD)/vector.o
+$(BUILD)/${LIB}: $(BUILD)/vector.o $(BUILD)/btree.o
 	$(AR) $(ARFLAGS) $@ $^
 
 $(BUILD)/vector.o: $(SRC)/vector.c
+	$(CC) $(CFLAGS) -c $^ -o $@
+
+$(BUILD)/btree.o: $(SRC)/btree.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 # === Example ===
