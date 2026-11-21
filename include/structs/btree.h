@@ -15,4 +15,7 @@ void* btreesrch(BTree* t, void* data);
 int btreeins(BTree* t, void* data);
 
 
+int comparator_int(void* d1, void* d2, void* ctx);
+
+
 #endif

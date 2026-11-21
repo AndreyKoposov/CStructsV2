@@ -59,14 +59,14 @@ void btreedes(BTree* t) {
     }
 
     Vector* v = vector(sizeof(Node*));
-    vecpush(v, t->head);
+    vecpush(v, &t->head);
 
     Node* tmp;
     while (vecsize(v) > 0) {
         vecpop(v, &tmp);
 
-        if (tmp->left) vecpush(v, tmp->left);
-        if (tmp->right) vecpush(v, tmp->right);
+        if (tmp->left) vecpush(v, &tmp->left);
+        if (tmp->right) vecpush(v, &tmp->right);
 
         free(tmp->data);
         free(tmp);
@@ -75,7 +75,7 @@ void btreedes(BTree* t) {
     free(t);
 }
 
-void* btreesrch(const BTree* t, const void* data) {
+void* btreesrch(BTree* t, void* data) {
     if (!t || !data || !t->head) return NULL;
 
     Node* tmp = t->head;
@@ -88,7 +88,7 @@ void* btreesrch(const BTree* t, const void* data) {
     return NULL;
 }
 
-int btreeins(BTree* t, const void* data) {
+int btreeins(BTree* t, void* data) {
     if (!t) return -1;
 
     if (!t->head) {
@@ -122,4 +122,15 @@ int btreeins(BTree* t, const void* data) {
     return -1;
 }
 
-size_t btreesize(const BTree* t) { if (t) return t->size; }
+size_t btreesize(BTree* t) { return t->size; }
+
+
+int comparator_int(void* d1, void* d2, void* ctx) {
+    (void)ctx;
+
+    int* i1 = d1;
+    int* i2 = d2;
+
+    if (*i1 == *i2) return 0;
+    else return *i1 < *i2 ? -1 : 1;
+}

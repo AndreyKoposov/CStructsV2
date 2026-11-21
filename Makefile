@@ -16,7 +16,7 @@ LIB  	:= libcstructs.a
 
 # === Tests ===
 test: lib $(BUILD)/test
-	$(VFLAGS) $(BUILD)/test $(ARGS)
+	$(VFLAGS) $(BUILD)/test $(suite)
 
 $(BUILD)/test: $(BUILD)/test.o $(BUILD)/test_vector.o $(BUILD)/test_btree.o
 	$(CC) $(TFLAGS) $^ -Lbuild -lcstructs -lcunit -o $@

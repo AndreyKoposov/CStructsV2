@@ -59,6 +59,7 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(vectorS, "End to end", test_end_to_end)) cleanup();
 
     if (!CU_add_test(btreeS, "Insert", test_btree_insert)) cleanup();
+    if (!CU_add_test(btreeS, "Search", test_btree_search)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
 
