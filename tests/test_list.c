@@ -1,6 +1,7 @@
 #include <CUnit/Basic.h>
 
 #include "structs/list.h"
+#include "utils/comparators.h"
 
 
 void test_list_push(void) {
@@ -102,6 +103,32 @@ void test_list_remove(void) {
     CU_ASSERT_EQUAL(a, 2);
     CU_ASSERT_EQUAL(b, 5);
     CU_ASSERT_EQUAL(c, 3);
+
+    // Clean up
+    listdes(l);
+}
+
+void test_list_find(void) {
+    // Arrange
+    List* l = list(sizeof(int));
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    int d = 10;
+    listpushb(l, &a);
+    listpushb(l, &b);
+    listpushb(l, &c);
+    
+    // Act
+    size_t pos;
+    int status1 = listfind(l, &b, &pos, comparator_int, NULL);
+    int status2 = listfind(l, &d, NULL, comparator_int, NULL);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, -1);
+    
+    CU_ASSERT_EQUAL(pos, 1);
 
     // Clean up
     listdes(l);

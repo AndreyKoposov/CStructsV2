@@ -194,4 +194,23 @@ int listremove(List *l, size_t i, void* out) {
     return 0;
 }
 
+int listfind(List *l, void *data, size_t* out, int (*comp)(void*, void*, void* ctx), void* ctx) {
+    if (!l || !data || !comp) return -1;
+
+    LNode* n = l->first;
+    size_t c = 0;
+    while (n) {
+        if (comp(n->data, data, ctx) == 0) {
+            if (out)
+                *out = c;
+            return 0;
+        }
+        n = n->next;
+        c++;
+    }
+
+    return -1;
+}
+
 size_t listsize(List* l) { return l->size; }
+bool listempty(List *l) { return l->size == 0; }

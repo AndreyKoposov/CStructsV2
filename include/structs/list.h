@@ -19,8 +19,7 @@ int listins(List *l, size_t i, void *data);
 int listpopf(List *l, void* out);
 int listremove(List *l, size_t i, void* out);
 
-int listfind(List *l, void *data);
-bool listcont(List *l, void *data);
+int listfind(List *l, void *data, size_t* out, int (*comp)(void*, void*, void* ctx), void* ctx);
 bool listempty(List *l);
 
 

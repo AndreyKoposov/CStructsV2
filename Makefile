@@ -37,7 +37,7 @@ $(BUILD)/test_list.o: $(TESTS)/test_list.c
 # === Lib ===
 lib: $(BUILD)/${LIB}
 
-$(BUILD)/${LIB}: $(BUILD)/vector.o $(BUILD)/btree.o $(BUILD)/list.o
+$(BUILD)/${LIB}: $(BUILD)/vector.o $(BUILD)/btree.o $(BUILD)/list.o $(BUILD)/comparators.o
 	$(AR) $(ARFLAGS) $@ $^
 # Vector
 $(BUILD)/vector.o: $(SRC)/vector.c
@@ -47,6 +47,9 @@ $(BUILD)/btree.o: $(SRC)/btree.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 # List
 $(BUILD)/list.o: $(SRC)/list.c
+	$(CC) $(CFLAGS) -c $^ -o $@
+# Comparators
+$(BUILD)/comparators.o: $(SRC)/comparators.c
 	$(CC) $(CFLAGS) -c $^ -o $@
 
 # === Example ===
