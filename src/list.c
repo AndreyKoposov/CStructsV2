@@ -80,37 +80,37 @@ void  listcle(List *l) {
 }
 
 int listpushf(List *l, void *data) {
-    if (!l) return -1;
+    if (!l || !data) return -1;
 
     LNode* n = _create_node(l, data);
     if (!n) return -1;
 
-    if (l->first)
+    if (l->size >= 1)
         n->next = l->first;
-
     l->first = n;
-
-    if (!l->last)
-        l->last = n;
-
     l->size++;
 
     return 0;
 }
 
 int listpushb(List *l, void *data) {
-    if (!l) return -1;
+    if (!l || !data) return -1;
 
     LNode* n = _create_node(l, data);
     if (!n) return -1;
 
-    if (!l->first)
+    if (l->size == 0)
         l->first = n;
-    if (!l->last)
+
+    if (l->size == 1) {
+        l->first->next = n;
         l->last = n;
-    else
+    }
+
+    if (l->size > 1) {
         l->last->next = n;
-    l->last = n;
+        l->last = n;
+    }
 
     l->size++;
 
@@ -118,10 +118,10 @@ int listpushb(List *l, void *data) {
 }
 
 int listins(List *l, size_t i, void *data) {
-    if (!l) return -1;
+    if (!l || !data || i >= l->size) return -1;
 
     LNode* tmp = l->first;
-    LNode* prev;
+    LNode* prev = NULL;
     for (size_t c = 0; c < i; c++) {
         if (!tmp)
             return -1;
@@ -140,6 +140,56 @@ int listins(List *l, size_t i, void *data) {
     n->next = tmp;
     prev->next = n;
     l->size++;
+
+    return 0;
+}
+
+int listpopf(List *l, void* out) {
+    if (!l || l->size == 0) return -1;
+
+    if (out)
+        memcpy(out, l->first->data, l->el_size);
+
+    LNode* first = l->first->next;
+    free(l->first->data);
+    free(l->first);
+    l->first = first;
+    l->size--;
+
+    return 0;
+}
+
+int listremove(List *l, size_t i, void* out) {
+    if (!l || i >= l->size) return -1;
+
+    LNode* tmp = l->first;
+    LNode* prev = NULL;
+    for (size_t c = 0; c < i; c++) {
+        if (!tmp)
+            return -1;
+        prev = tmp;
+        tmp = tmp->next;
+    }
+
+    if (out)
+        memcpy(out, tmp->data, l->el_size);
+
+    LNode* next = tmp->next;
+    free(tmp->data);
+    free(tmp);
+
+    if (l->size == 1) {
+        l->first= NULL;
+    }
+    if (l->size == 2) {
+        l->last = NULL;
+        prev->next = next;
+    }
+    if (l->size > 2) {
+        prev->next = next;
+    }
+
+    l->size--;
 
     return 0;
 }

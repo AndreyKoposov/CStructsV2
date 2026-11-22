@@ -16,9 +16,8 @@ int listpushf(List *l, void *data);
 int listpushb(List *l, void *data);
 int listins(List *l, size_t i, void *data);
 
-int listpopf(List *l, void* data);
-int listpopb(List *l, void* data);
-int listremove(List *l, size_t i, void* data);
+int listpopf(List *l, void* out);
+int listremove(List *l, size_t i, void* out);
 
 int listfind(List *l, void *data);
 bool listcont(List *l, void *data);
