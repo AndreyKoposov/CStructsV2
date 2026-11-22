@@ -3,6 +3,7 @@
 
 #include "test_vector.h"
 #include "test_btree.h"
+#include "test_list.h"
 
 
 CU_ErrorCode cleanup() {
@@ -19,6 +20,7 @@ int main(int argc, char* argv[]) {
 
     CU_pSuite vectorS = NULL;
     CU_pSuite btreeS = NULL;
+    CU_pSuite listS = NULL;
 
     if (CUE_SUCCESS != CU_initialize_registry()) return CU_get_error();
 
@@ -27,6 +29,9 @@ int main(int argc, char* argv[]) {
 
     btreeS = CU_add_suite("Binary Tree", NULL, NULL);
     if (btreeS == NULL) cleanup();
+
+    listS = CU_add_suite("List", NULL, NULL);
+    if (listS == NULL) cleanup();
 
     if (!CU_add_test(vectorS, "Create", test_create)) cleanup();
     if (!CU_add_test(vectorS, "Destroy", test_destroy)) cleanup();
@@ -61,10 +66,14 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(btreeS, "Insert", test_btree_insert)) cleanup();
     if (!CU_add_test(btreeS, "Search", test_btree_search)) cleanup();
 
+    if (!CU_add_test(listS, "Push front/back", test_list_push)) cleanup();
+    if (!CU_add_test(listS, "Insert", test_list_insert)) cleanup();
+
     CU_basic_set_mode(CU_BRM_VERBOSE);
 
     if (strcmp(suite, "vector") == 0) CU_basic_run_suite(vectorS);
     if (strcmp(suite, "btree") == 0) CU_basic_run_suite(btreeS);
+    if (strcmp(suite, "list") == 0) CU_basic_run_suite(listS);
     if (strcmp(suite, "all") == 0) CU_basic_run_tests();
 
     cleanup();
