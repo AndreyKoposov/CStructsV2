@@ -14,6 +14,8 @@ typedef struct list {
     LNode* last;
     size_t size;
     size_t el_size;
+    comparator comp;
+    void* ctx;
 } List;
 
 static LNode* _create_node(List* l, void* data) {
@@ -33,7 +35,7 @@ static LNode* _create_node(List* l, void* data) {
 }
 
 
-List* list(size_t el_size) {
+List* list(size_t el_size, comparator comp, void* ctx) {
     if (el_size == 0) return NULL;
 
     List* l = malloc(sizeof(List));
@@ -43,6 +45,8 @@ List* list(size_t el_size) {
     l->last = NULL;
     l->size = 0;
     l->el_size = el_size;
+    l->comp = comp;
+    l->ctx = ctx;
 
     return l;
 }
@@ -194,13 +198,13 @@ int listremove(List *l, size_t i, void* out) {
     return 0;
 }
 
-int listfind(List *l, void *data, size_t* out, int (*comp)(void*, void*, void* ctx), void* ctx) {
-    if (!l || !data || !comp) return -1;
+int listfind(List *l, void *data, size_t* out) {
+    if (!l || !data || !l->comp) return -1;
 
     LNode* n = l->first;
     size_t c = 0;
     while (n) {
-        if (comp(n->data, data, ctx) == 0) {
+        if (l->comp(n->data, data, l->ctx) == 0) {
             if (out)
                 *out = c;
             return 0;

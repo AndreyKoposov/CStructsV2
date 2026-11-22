@@ -3,10 +3,10 @@
 
 #include <stddef.h>
 
+#include "utils/comparators.h"
+
 
 typedef struct btree BTree;
-
-typedef int (*comparator)(void* d1, void* d2, void* ctx);
 
 BTree* btree(size_t el_size, comparator comp, void* ctx);
 void btreedes(BTree* t);

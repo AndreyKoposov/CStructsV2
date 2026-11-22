@@ -6,7 +6,7 @@
 
 void test_list_push(void) {
     // Arrange
-    List* l = list(sizeof(int));
+    List* l = list(sizeof(int), NULL, NULL);
     int a = 3;
     int b = 2;
     int c = 5;
@@ -28,7 +28,7 @@ void test_list_push(void) {
 
 void test_list_insert(void) {
     // Arrange
-    List* l = list(sizeof(int));
+    List* l = list(sizeof(int), NULL, NULL);
     int a = 3;
     int b = 2;
     int c = 5;
@@ -50,7 +50,7 @@ void test_list_insert(void) {
 
 void test_list_pop(void) {
     // Arrange
-    List* l = list(sizeof(int));
+    List* l = list(sizeof(int), NULL, NULL);
     int a = 3;
     int b = 2;
     int c = 5;
@@ -80,7 +80,7 @@ void test_list_pop(void) {
 
 void test_list_remove(void) {
     // Arrange
-    List* l = list(sizeof(int));
+    List* l = list(sizeof(int), NULL, NULL);
     int a = 3;
     int b = 2;
     int c = 5;
@@ -110,7 +110,7 @@ void test_list_remove(void) {
 
 void test_list_find(void) {
     // Arrange
-    List* l = list(sizeof(int));
+    List* l = list(sizeof(int), comparator_int, NULL);
     int a = 3;
     int b = 2;
     int c = 5;
@@ -121,13 +121,13 @@ void test_list_find(void) {
     
     // Act
     size_t pos;
-    int status1 = listfind(l, &b, &pos, comparator_int, NULL);
-    int status2 = listfind(l, &d, NULL, comparator_int, NULL);
+    int status1 = listfind(l, &b, &pos);
+    int status2 = listfind(l, &d, NULL);
 
     // Assert
     CU_ASSERT_EQUAL(status1, 0);
     CU_ASSERT_EQUAL(status2, -1);
-    
+
     CU_ASSERT_EQUAL(pos, 1);
 
     // Clean up
