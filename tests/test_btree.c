@@ -1,6 +1,7 @@
 #include <CUnit/Basic.h>
 
 #include "structs/btree.h"
+#include "utils/comparators.h"
 
 
 void test_btree_insert(void) {
