@@ -392,6 +392,17 @@ void* vectoarr(Vector* a) {
     return arr;
 }
 
+int vecfind(Vector* v, void *data, size_t* out) {
+    for (size_t i = 0; i < v->size; i++) {
+        if (v->comp(data, vecat(v, i), v->ctx) == 0) {
+            if (out)
+                *out = i;
+            return 0;
+        }
+    }
+    return -1;
+}
+
 size_t vecsize(Vector *v) { return v->size; }
 size_t veccap(Vector *v) { return v->capacity; }
 bool vecemp(Vector *v) { return v->size == 0; }

@@ -54,6 +54,7 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(vectorS, "Max/Min", test_max_min)) cleanup();
     if (!CU_add_test(vectorS, "Sort", test_sort)) cleanup();
     if (!CU_add_test(vectorS, "From/To array", test_from_to_array)) cleanup();
+    if (!CU_add_test(vectorS, "Find", test_vector_find)) cleanup();
     if (!CU_add_test(vectorS, "Different types", test_different_types)) cleanup();
     if (!CU_add_test(vectorS, "Basic lifecycle", test_basic_lifecycle)) cleanup();
     if (!CU_add_test(vectorS, "Modifications", test_modifications)) cleanup();
@@ -62,6 +63,7 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(vectorS, "Array conversations", test_array_conversions)) cleanup();
     if (!CU_add_test(vectorS, "Errors", test_error_paths)) cleanup();
     if (!CU_add_test(vectorS, "End to end", test_end_to_end)) cleanup();
+    if (!CU_add_test(vectorS, "Comparator copy", test_copy_preserves_comparator_behavioral)) cleanup();
 
     if (!CU_add_test(btreeS, "Insert", test_btree_insert)) cleanup();
     if (!CU_add_test(btreeS, "Search", test_btree_search)) cleanup();

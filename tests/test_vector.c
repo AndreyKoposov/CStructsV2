@@ -643,6 +643,27 @@ void test_from_to_array(void) {
     free(arr2);
 }
 
+void test_vector_find(void) {
+    // Arrange
+    int arr[] = {3,2,31,4,7,9};
+    Vector* v2 = vecfromarr(arr, 6, sizeof(int), comparator_int, NULL);
+    int a = 31;
+    int b = 100;
+
+    // Act
+    size_t pos;
+    int status1 = vecfind(v2, &a, &pos);
+    int status2 = vecfind(v2, &b, NULL);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, -1);
+    CU_ASSERT_EQUAL(pos, 2);
+
+    // Clean up
+    vecdes(v2);
+}
+
 void test_different_types(void) {
     // Arrange
     typedef struct custom {
@@ -1040,4 +1061,42 @@ void test_end_to_end(void)
 
     vecdes(snapshot);
     vecdes(log);
+}
+
+static int cmp_scaled(void *a, void *b, void *ctx)
+{
+    int mul = ctx ? *(int *)ctx : 1;
+    int x = *(int *)a * mul;
+    int y = *(int *)b * mul;
+    return (x > y) - (x < y);
+}
+
+void test_copy_preserves_comparator_behavioral(void) {
+    int mul_src = -1;
+
+    Vector *src = vector(sizeof(int), cmp_scaled, &mul_src);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(src);
+
+    int vals[] = { 3, 1, 4, 2, 5 };
+    for (size_t i = 0; i < 5; ++i)
+        CU_ASSERT_EQUAL(vecpush(src, &vals[i]), 0);
+
+    Vector *clone = vecclone(src);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(clone);
+
+    /* Поведенческая проверка: сортируем клон и оригинал —
+       при mul = -1 они должны идти по убыванию. Если ctx потерялся,
+       cmp_scaled получит NULL и mul станет 1 -> порядок возрастёт. */
+    CU_ASSERT_EQUAL(vecsort(src), 0);
+    CU_ASSERT_EQUAL(vecsort(clone), 0);
+
+    for (size_t i = 0; i < 5; ++i)
+        CU_ASSERT_EQUAL(*(int *)vecat(src,   i),
+                        *(int *)vecat(clone, i));
+
+    /* и явно: первый элемент больше последнего (убывание) */
+    CU_ASSERT_TRUE(*(int *)vecat(clone, 0) > *(int *)vecat(clone, 4));
+
+    vecdes(src);
+    vecdes(clone);
 }

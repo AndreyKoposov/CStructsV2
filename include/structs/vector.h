@@ -69,6 +69,8 @@ int vecsort(Vector* a);
 Vector* vecfromarr(void* arr, size_t len, size_t el_size, comparator comp, void* ctx);
 // Возвращает указатель на массив с данными вектора a
 void* vectoarr(Vector* a);
+// Возвращает 0 при успешном нахождении и -1 при неудаче. Записывает в out индекс первого найденного элемента
+int vecfind(Vector* v, void *data, size_t* out);
 
 
 #ifdef __cplusplus
