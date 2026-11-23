@@ -12,7 +12,7 @@ static void print_vec3(const void *elem, void *ctx) {
 
 int main(void) {
     /* int */
-    Vector *vi = vector(sizeof(int));
+    Vector *vi = vector(sizeof(int), comparator_int, NULL);
     for (int i = 0; i < 5; i++) vecpush(vi, &i);
     printf("int vector: size=%zu cap=%zu\n", vecsize(vi), veccap(vi));
     int sum = 0;
@@ -23,7 +23,7 @@ int main(void) {
     vecdes(vi);
 
     /* Vec3 */
-    Vector *v3 = vector(sizeof(Vec3));
+    Vector *v3 = vector(sizeof(Vec3), NULL, NULL);
     Vec3 pts[] = {{1,0,0}, {0,1,0}, {0,0,1}};
     for (int i = 0; i < 3; i++) vecpush(v3, &pts[i]);
 

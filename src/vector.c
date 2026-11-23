@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "structs/vector.h"
+#include "utils/comparators.h"
 
 #define RESERVE_FACTOR 2
 
@@ -11,6 +12,9 @@ typedef struct vector {
     size_t  size;
     size_t  capacity;
     size_t  elem_size;
+
+    comparator comp;
+    void* ctx;
 } Vector;
 
 static int _vec_realloc(Vector* v, size_t new_cap) {
@@ -49,7 +53,7 @@ static inline void* _arr_elem_ptr(void* arr, size_t i, size_t el_size) {
     return (char *)arr + i * el_size;
 }
 
-Vector* vector(size_t elem_size) {
+Vector* vector(size_t elem_size, comparator comp, void* ctx) {
     if (elem_size == 0) return NULL;
 
     Vector* v = malloc(sizeof(Vector));
@@ -59,6 +63,8 @@ Vector* vector(size_t elem_size) {
     v->size = 0;
     v->capacity = 0;
     v->elem_size = elem_size;
+    v->comp = comp;
+    v->ctx = ctx;
 
     return v;
 }
@@ -194,7 +200,7 @@ int veceraser(Vector* v, size_t first, size_t last) {
 Vector* vecclone(Vector *src) {
     if (!src) return NULL;
 
-    Vector* out = vector(src->elem_size);
+    Vector* out = vector(src->elem_size, src->comp, src->ctx);
     if (!out) return NULL;
 
     if (vecres(out, src->size) == -1) return NULL;
@@ -225,27 +231,33 @@ int vecswp(Vector* a, Vector* b) {
     void* tmp_data = a->data;
     size_t tmp_cap = a->capacity;
     size_t tmp_el = a->elem_size;
+    comparator tmp_comp = a->comp;
+    void* tmp_ctx = a->ctx;
 
     a->capacity = b->capacity;
     a->size = b->size;
     a->elem_size = b->elem_size;
     a->data = b->data;
+    a->comp = b->comp;
+    a->ctx = b->ctx;
 
     b->capacity = tmp_cap;
     b->size = tmp_size;
     b->elem_size = tmp_el;
     b->data = tmp_data;
+    b->comp = tmp_comp;
+    b->ctx = tmp_ctx;
 
     return 0;
 }
 
-bool vecequ(Vector* a, Vector* b, bool (*eq)(void*, void*, void* ctx), void* ctx) {
-    if (!a || !b) return false;
+bool vecequ(Vector* a, Vector* b, void* ctx) {
+    if (!a || !b || !a->comp) return false;
     if (vecsize(a) != vecsize(b)) return false;
     if (a->elem_size != b->elem_size) return false;
 
     for (size_t i = 0; i < a->size; i++)
-        if (!eq(vecat(a, i), vecat(b, i), ctx))
+        if (a->comp(vecat(a, i), vecat(b, i), ctx) != 0)
             return false;
 
     return true;
@@ -260,6 +272,8 @@ int vecmove(Vector* dst, Vector* src) {
     dst->data = src->data;
     dst->size = src->size;
     dst->capacity = src->capacity;
+    dst->comp = src->comp;
+    dst->ctx = src->ctx;
 
     src->size = 0;
     src->capacity = 0;
@@ -268,39 +282,39 @@ int vecmove(Vector* dst, Vector* src) {
     return 0;
 }
 
-int vecmax(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i) {
-    if (!a || !value || vecsize(a) < 1) return -1;
+int vecmax(Vector* a, int* out, size_t* i) {
+    if (!a || !a->comp || vecsize(a) < 1) return -1;
 
-    int max = value(vecat(a, 0), ctx);
+    void* max = vecat(a, 0);
     int pos = 0;
     for (size_t i = 1; i < vecsize(a); i++) {
-        int another = value(vecat(a, i), ctx);
-        if (another > max) {
+        void* another = vecat(a, i);
+        if (a->comp(another, max, a->ctx) == 1) {
             max = another;
             pos = i;
         }
     }
 
-    *out = max;
+    vecget(a, pos, out);
     *i = pos;
 
     return 0;
 }
 
-int vecmin(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i) {
-    if (!a || !value || vecsize(a) < 1) return -1;
+int vecmin(Vector* a, int* out, size_t* i) {
+    if (!a || !a->comp || vecsize(a) < 1) return -1;
 
-    int min = value(vecat(a, 0), ctx);
+    void* min = vecat(a, 0);
     int pos = 0;
     for (size_t i = 1; i < vecsize(a); i++) {
-        int another = value(vecat(a, i), ctx);
-        if (another < min) {
+        void* another = vecat(a, i);
+        if (a->comp(another, min, a->ctx) == -1) {
             min = another;
             pos = i;
         }
     }
 
-    *out = min;
+    vecget(a, pos, out);
     *i = pos;
 
     return 0;
@@ -317,14 +331,13 @@ static void _swap(void* a, void* b, size_t el_s) {
 }
 
 static size_t _partition(void* arr, size_t low, size_t high, size_t el_s,
-                         int (*value)(void*, void* ctx), void* ctx) {
-    void* element = _arr_elem_ptr(arr, high, el_s);
-    int pivot = value(element, ctx);
+                         comparator comp, void* ctx) {
+    void* pivot = _arr_elem_ptr(arr, high, el_s);
     size_t i = low;
 
     for (size_t j = low; j < high; j++) {
         void* arr_j = _arr_elem_ptr(arr, j, el_s);
-        if (value(arr_j, ctx) < pivot) {
+        if (comp(arr_j, pivot, ctx) == -1) {
             void* arr_i = _arr_elem_ptr(arr, i, el_s);
             _swap(arr_i, arr_j, el_s);
             i++;
@@ -337,27 +350,27 @@ static size_t _partition(void* arr, size_t low, size_t high, size_t el_s,
 }
 
 static void _quick_sort(void* arr, size_t low, size_t high, size_t el_s,
-                        int (*value)(void*, void* ctx), void* ctx) {
+                        comparator comp, void* ctx) {
     if (low < high) {
-        size_t pi = _partition(arr, low, high, el_s, value, ctx);
+        size_t pi = _partition(arr, low, high, el_s, comp, ctx);
         if (pi > low)
-            _quick_sort(arr, low, pi - 1, el_s, value, ctx);
-        _quick_sort(arr, pi + 1, high, el_s, value, ctx);
+            _quick_sort(arr, low, pi - 1, el_s, comp, ctx);
+        _quick_sort(arr, pi + 1, high, el_s, comp, ctx);
     }
 }
 
-int vecsort(Vector* a, int (*value)(void*, void* ctx), void* ctx) {
-    if (!a || !value) return -1;
+int vecsort(Vector* a) {
+    if (!a || !a->comp) return -1;
 
-    _quick_sort(a->data, 0, a->size-1, a->elem_size, value, ctx);
+    _quick_sort(a->data, 0, a->size-1, a->elem_size, a->comp, a->ctx);
 
     return 0;
 }
 
-Vector* vecfromarr(void* arr, size_t len, size_t el_size) {
+Vector* vecfromarr(void* arr, size_t len, size_t el_size, comparator comp, void* ctx) {
     if (!arr) return NULL;
 
-    Vector* a = vector(el_size);
+    Vector* a = vector(el_size, comp, ctx);
     a->elem_size = el_size;
     a->size = len;
     if (vecres(a, len) == -1) {
@@ -377,6 +390,17 @@ void* vectoarr(Vector* a) {
     memcpy(arr, a->data, a->size*a->elem_size);
 
     return arr;
+}
+
+int vecfind(Vector* v, void *data, size_t* out) {
+    for (size_t i = 0; i < v->size; i++) {
+        if (v->comp(data, vecat(v, i), v->ctx) == 0) {
+            if (out)
+                *out = i;
+            return 0;
+        }
+    }
+    return -1;
 }
 
 size_t vecsize(Vector *v) { return v->size; }

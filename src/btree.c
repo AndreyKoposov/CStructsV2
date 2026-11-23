@@ -58,7 +58,7 @@ void btreedes(BTree* t) {
         return;
     }
 
-    Vector* v = vector(sizeof(Node*));
+    Vector* v = vector(sizeof(Node*), NULL, NULL);
     vecpush(v, &t->head);
 
     Node* tmp;

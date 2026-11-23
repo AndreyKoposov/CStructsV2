@@ -9,7 +9,7 @@ void test_create(void) {
     // Arrange
 
     // Act
-    Vector* v = vector(sizeof(int));
+    Vector* v = vector(sizeof(int), NULL, NULL);
 
     // Assert
     CU_ASSERT_EQUAL(vecsize(v), 0);
@@ -22,9 +22,9 @@ void test_create(void) {
 
 void test_destroy(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
-    Vector* v3 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(int), NULL, NULL);
+    Vector* v3 = vector(sizeof(int), NULL, NULL);
 
     vecres(v2, 10);
     
@@ -44,12 +44,12 @@ void test_destroy(void) {
 
 void test_reserve(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
-    Vector* v3 = vector(sizeof(int));
-    Vector* v4 = vector(sizeof(int));
-    Vector* v5 = vector(sizeof(int));
-    Vector* v6 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(int), NULL, NULL);
+    Vector* v3 = vector(sizeof(int), NULL, NULL);
+    Vector* v4 = vector(sizeof(int), NULL, NULL);
+    Vector* v5 = vector(sizeof(int), NULL, NULL);
+    Vector* v6 = vector(sizeof(int), NULL, NULL);
 
     // Act
     int status1 = vecres(v1, 10);
@@ -106,9 +106,9 @@ void test_reserve(void) {
 
 void test_shrink(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
-    Vector* v3 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(int), NULL, NULL);
+    Vector* v3 = vector(sizeof(int), NULL, NULL);
     vecres(v2, 10);
     vecres(v3, 10);
 
@@ -143,8 +143,8 @@ void test_shrink(void) {
 
 void test_push(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(int), NULL, NULL);
     int i = 3;
     size_t n = 10;
 
@@ -174,8 +174,8 @@ void test_push(void) {
 
 void test_pop() {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(int), NULL, NULL);
     int i = 5;
     size_t n = 10;
 
@@ -202,7 +202,7 @@ void test_pop() {
 
 void test_at(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
     vecres(v1, 10);
 
     int a = 2;
@@ -224,7 +224,7 @@ void test_at(void) {
 
 void test_back(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
 
     // Act
     int* val = vecback(v1);
@@ -238,8 +238,8 @@ void test_back(void) {
 
 void test_get(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(int), NULL, NULL);
     int a = 2;
     vecpush(v1, &a);
 
@@ -270,7 +270,7 @@ static void add(void* el, void* ctx) {
 
 void test_for(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
     int a = 2;
     vecpush(v1, &a);
     vecpush(v1, &a);
@@ -292,8 +292,8 @@ void test_for(void) {
 
 void test_insert(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(int), NULL, NULL);
     int a = 2;
     vecpush(v1, &a);
     vecpush(v1, &a);
@@ -326,8 +326,8 @@ void test_insert(void) {
 
 void test_erase(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(int), NULL, NULL);
     int a = 2;
     int b = 3;
     vecpush(v1, &a);
@@ -354,9 +354,9 @@ void test_erase(void) {
 
 void test_erase_range(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
-    Vector* v3 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(int), NULL, NULL);
+    Vector* v3 = vector(sizeof(int), NULL, NULL);
     int a = 2;
     vecpush(v1, &a);
     vecpush(v1, &a);
@@ -394,10 +394,10 @@ void test_erase_range(void) {
 
 void test_copy(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
-    Vector* v3 = vector(sizeof(int));
-    Vector* v4 = vector(sizeof(double));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(int), NULL, NULL);
+    Vector* v3 = vector(sizeof(int), NULL, NULL);
+    Vector* v4 = vector(sizeof(double), NULL, NULL);
 
     int a = 2;
     vecpush(v1, &a);
@@ -433,7 +433,7 @@ void test_copy(void) {
 
 void test_clone(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
 
     int a = 2;
     vecpush(v1, &a);
@@ -454,8 +454,8 @@ void test_clone(void) {
 
 void test_swap(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(double));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(double), NULL, NULL);
 
     int a = 2;
     vecpush(v1, &a);
@@ -481,19 +481,11 @@ void test_swap(void) {
     vecdes(v2);
 }
 
-static bool equals(void* el1, void* el2, void* ctx) {
-    int* a = el1;
-    int* b = el2;
-    (void)ctx;
-
-    return *a == *b;
-}
-
 void test_equals(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
-    Vector* v3 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), comparator_int, NULL);
+    Vector* v2 = vector(sizeof(int), comparator_int, NULL);
+    Vector* v3 = vector(sizeof(int), comparator_int, NULL);
 
     int a = 3;
     vecpush(v1, &a);
@@ -510,8 +502,8 @@ void test_equals(void) {
     vecpush(v3, &c);
     
     // Act
-    bool res1 = vecequ(v1, v2, equals, NULL);
-    bool res2 = vecequ(v1, v3, equals, NULL);
+    bool res1 = vecequ(v1, v2, NULL);
+    bool res2 = vecequ(v1, v3, NULL);
 
     // Assert
     CU_ASSERT_EQUAL(res1, false);
@@ -525,9 +517,9 @@ void test_equals(void) {
 
 void test_move(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
-    Vector* v3 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), NULL, NULL);
+    Vector* v2 = vector(sizeof(int), NULL, NULL);
+    Vector* v3 = vector(sizeof(int), NULL, NULL);
 
     int a = 2;
     vecpush(v1, &a);
@@ -573,15 +565,10 @@ void test_move(void) {
     vecdes(v3);
 }
 
-static int value(void* x, void* ctx) {
-    (void)ctx;
-    return *(int*)x;
-}
-
 void test_max_min(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
-    Vector* v2 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), comparator_int, NULL);
+    Vector* v2 = vector(sizeof(int), comparator_int, NULL);
 
     for (size_t i = 0; i < 10; i++) {
         vecpush(v1, &i);
@@ -590,13 +577,13 @@ void test_max_min(void) {
     // Act
     int max;
     size_t max_pos;
-    int status1 = vecmax(v1, value, NULL, &max, &max_pos);
+    int status1 = vecmax(v1, &max, &max_pos);
 
     int min;
     size_t min_pos;
-    int status2 = vecmin(v1, value, NULL, &min, &min_pos);
+    int status2 = vecmin(v1, &min, &min_pos);
 
-    int status3 = vecmin(v2, value, NULL, NULL, NULL);
+    int status3 = vecmin(v2, NULL, NULL);
 
     // Assert
     CU_ASSERT_EQUAL(status1, 0);
@@ -616,7 +603,7 @@ void test_max_min(void) {
 
 void test_sort(void) {
     // Arrange
-    Vector* v1 = vector(sizeof(int));
+    Vector* v1 = vector(sizeof(int), comparator_int, NULL);
     
     int arr[] = {3,2,31,4,7,9};
     int sorted[] = {2,3,4,7,9,31};
@@ -625,7 +612,7 @@ void test_sort(void) {
     }
     
     // Act
-    int status = vecsort(v1, value, NULL);
+    int status = vecsort(v1);
 
     // Assert
     CU_ASSERT_EQUAL(status, 0);
@@ -642,7 +629,7 @@ void test_from_to_array(void) {
     int arr[] = {3,2,31,4,7,9};
 
     // Act
-    Vector* v2 = vecfromarr(arr, 6, sizeof(int));
+    Vector* v2 = vecfromarr(arr, 6, sizeof(int), NULL, NULL);
     int* arr2 = vectoarr(v2);
 
     // Assert
@@ -656,6 +643,27 @@ void test_from_to_array(void) {
     free(arr2);
 }
 
+void test_vector_find(void) {
+    // Arrange
+    int arr[] = {3,2,31,4,7,9};
+    Vector* v2 = vecfromarr(arr, 6, sizeof(int), comparator_int, NULL);
+    int a = 31;
+    int b = 100;
+
+    // Act
+    size_t pos;
+    int status1 = vecfind(v2, &a, &pos);
+    int status2 = vecfind(v2, &b, NULL);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, -1);
+    CU_ASSERT_EQUAL(pos, 2);
+
+    // Clean up
+    vecdes(v2);
+}
+
 void test_different_types(void) {
     // Arrange
     typedef struct custom {
@@ -664,9 +672,9 @@ void test_different_types(void) {
         double c;
     } Custom;
 
-    Vector* vi = vector(sizeof(int));
-    Vector* vd = vector(sizeof(double));
-    Vector* vs = vector(sizeof(Custom));
+    Vector* vi = vector(sizeof(int), comparator_int, NULL);
+    Vector* vd = vector(sizeof(double), comparator_double, NULL);
+    Vector* vs = vector(sizeof(Custom), NULL, NULL);
 
     int arr[] = {5,4,3,2,1,0};
 
@@ -677,8 +685,8 @@ void test_different_types(void) {
     CU_ASSERT_EQUAL(veccap(vd), 32);
     CU_ASSERT_EQUAL(vecsize(vd), 0);
     
-    Vector* vi2 = vecfromarr(arr, 6, sizeof(int));
-    CU_ASSERT_EQUAL(vecsort(vi2, value, NULL), 0);
+    Vector* vi2 = vecfromarr(arr, 6, sizeof(int), comparator_int, NULL);
+    CU_ASSERT_EQUAL(vecsort(vi2), 0);
 
     int* front = vecfront(vi2);
     int* back = vecback(vi2);
@@ -688,8 +696,8 @@ void test_different_types(void) {
 
     int max, min;
     size_t i_max, i_min;
-    CU_ASSERT_EQUAL(vecmax(vi2, value, NULL, &max, &i_max), 0);
-    CU_ASSERT_EQUAL(vecmin(vi2, value, NULL, &min, &i_min), 0);
+    CU_ASSERT_EQUAL(vecmax(vi2, &max, &i_max), 0);
+    CU_ASSERT_EQUAL(vecmin(vi2, &min, &i_min), 0);
 
     CU_ASSERT_EQUAL(*front, min);
     CU_ASSERT_EQUAL(*back, max);
@@ -743,7 +751,7 @@ void test_different_types(void) {
 
 void test_basic_lifecycle(void)
 {
-    Vector *v = vector(sizeof(int));
+    Vector *v = vector(sizeof(int), comparator_int, NULL);
     CU_ASSERT_PTR_NOT_NULL_FATAL(v);
 
     CU_ASSERT_EQUAL(vecsize(v), 0);
@@ -799,7 +807,7 @@ static void sum_int(void *el, void *ctx)
 
 void test_modifications(void)
 {
-    Vector *v = vector(sizeof(int));
+    Vector *v = vector(sizeof(int), comparator_int, NULL);
     CU_ASSERT_PTR_NOT_NULL_FATAL(v);
 
     for (int i = 0; i < 5; ++i)
@@ -839,15 +847,9 @@ void test_modifications(void)
     vecdes(v);
 }
 
-static bool eq_int(void *a, void *b, void *ctx)
-{
-    (void)ctx;
-    return *(int *)a == *(int *)b;
-}
-
 void test_copy_semantics(void)
 {
-    Vector *a = vector(sizeof(int));
+    Vector *a = vector(sizeof(int), comparator_int, NULL);
     CU_ASSERT_PTR_NOT_NULL_FATAL(a);
 
     for (int i = 0; i < 4; ++i)
@@ -857,29 +859,29 @@ void test_copy_semantics(void)
     Vector *b = vecclone(a);
     CU_ASSERT_PTR_NOT_NULL_FATAL(b);
     CU_ASSERT_EQUAL(vecsize(b), vecsize(a));
-    CU_ASSERT_TRUE(vecequ(a, b, eq_int, NULL));
+    CU_ASSERT_TRUE(vecequ(a, b, NULL));
 
     /* copy */
-    Vector *c = vector(sizeof(int));
+    Vector *c = vector(sizeof(int), comparator_int, NULL);
     CU_ASSERT_EQUAL(veccpy(c, a), 0);
-    CU_ASSERT_TRUE(vecequ(a, c, eq_int, NULL));
+    CU_ASSERT_TRUE(vecequ(a, c, NULL));
 
     /* swap: a и b станут разными после изменения a */
     CU_ASSERT_EQUAL(vecswp(a, c), 0);
-    CU_ASSERT_TRUE(vecequ(a, b, eq_int, NULL));
-    CU_ASSERT_TRUE(vecequ(c, b, eq_int, NULL));
+    CU_ASSERT_TRUE(vecequ(a, b, NULL));
+    CU_ASSERT_TRUE(vecequ(c, b, NULL));
 
     /* move */
-    Vector *d = vector(sizeof(int));
+    Vector *d = vector(sizeof(int), comparator_int, NULL);
     CU_ASSERT_EQUAL(vecmove(d, a), 0);
-    CU_ASSERT_TRUE(vecequ(d, b, eq_int, NULL));
+    CU_ASSERT_TRUE(vecequ(d, b, NULL));
     /* src после move должен быть пустым */
     CU_ASSERT_TRUE(vecemp(a));
 
     /* изменяем d и проверяем, что b не затронут */
     int z = 999;
     CU_ASSERT_EQUAL(vecpush(d, &z), 0);
-    CU_ASSERT_FALSE(vecequ(d, b, eq_int, NULL));
+    CU_ASSERT_FALSE(vecequ(d, b, NULL));
 
     vecdes(a);
     vecdes(b);
@@ -887,15 +889,9 @@ void test_copy_semantics(void)
     vecdes(d);
 }
 
-static int value_int(void *el, void *ctx)
-{
-    (void)ctx;
-    return *(int *)el;
-}
-
 void test_min_max_sort(void)
 {
-    Vector *v = vector(sizeof(int));
+    Vector *v = vector(sizeof(int), comparator_int, NULL);
     CU_ASSERT_PTR_NOT_NULL_FATAL(v);
 
     int data[] = { 42, -7, 13, 0, 99, 13 };
@@ -905,27 +901,27 @@ void test_min_max_sort(void)
     /* max */
     int maxv = 0;
     size_t maxi = (size_t)-1;
-    CU_ASSERT_EQUAL(vecmax(v, value_int, NULL, &maxv, &maxi), 0);
+    CU_ASSERT_EQUAL(vecmax(v, &maxv, &maxi), 0);
     CU_ASSERT_EQUAL(maxv, 99);
     CU_ASSERT_EQUAL(maxi, 4);
 
     /* min */
     int minv = 0;
     size_t mini = (size_t)-1;
-    CU_ASSERT_EQUAL(vecmin(v, value_int, NULL, &minv, &mini), 0);
+    CU_ASSERT_EQUAL(vecmin(v, &minv, &mini), 0);
     CU_ASSERT_EQUAL(minv, -7);
     CU_ASSERT_EQUAL(mini, 1);
 
     /* sort */
-    CU_ASSERT_EQUAL(vecsort(v, value_int, NULL), 0);
+    CU_ASSERT_EQUAL(vecsort(v), 0);
     int expected[] = { -7, 0, 13, 13, 42, 99 };
     for (size_t i = 0; i < sizeof(expected) / sizeof(expected[0]); ++i)
         CU_ASSERT_EQUAL(*(int *)vecat(v, i), expected[i]);
 
     /* после сортировки min/max на краях */
-    CU_ASSERT_EQUAL(vecmin(v, value_int, NULL, &minv, &mini), 0);
+    CU_ASSERT_EQUAL(vecmin(v, &minv, &mini), 0);
     CU_ASSERT_EQUAL(mini, 0);
-    CU_ASSERT_EQUAL(vecmax(v, value_int, NULL, &maxv, &maxi), 0);
+    CU_ASSERT_EQUAL(vecmax(v, &maxv, &maxi), 0);
     CU_ASSERT_EQUAL(maxi, 5);
 
     vecdes(v);
@@ -935,7 +931,7 @@ void test_array_conversions(void)
 {
     int arr[] = { 5, 4, 3, 2, 1 };
 
-    Vector *v = vecfromarr(arr, 5, sizeof(int));
+    Vector *v = vecfromarr(arr, 5, sizeof(int), comparator_int,  NULL);
     CU_ASSERT_PTR_NOT_NULL_FATAL(v);
     CU_ASSERT_EQUAL(vecsize(v), 5);
     CU_ASSERT_EQUAL(*(int *)vecat(v, 0), 5);
@@ -953,7 +949,7 @@ void test_array_conversions(void)
     CU_ASSERT_EQUAL(out[4], 1);
 
     /* сортируем и снова извлекаем */
-    CU_ASSERT_EQUAL(vecsort(v, value_int, NULL), 0);
+    CU_ASSERT_EQUAL(vecsort(v), 0);
     void *raw2 = vectoarr(v);
     CU_ASSERT_PTR_NOT_NULL_FATAL(raw2);
     int *out2 = (int *)raw2;
@@ -967,7 +963,7 @@ void test_array_conversions(void)
 
 void test_error_paths(void)
 {
-    Vector *v = vector(sizeof(int));
+    Vector *v = vector(sizeof(int), comparator_int, NULL);
     CU_ASSERT_PTR_NOT_NULL_FATAL(v);
 
     int x = 1, out = 0;
@@ -990,18 +986,18 @@ void test_error_paths(void)
     CU_ASSERT_NOT_EQUAL(veceraser(v, 1, 0), 0);
 
     /* equal с разной длиной */
-    Vector *w = vector(sizeof(int));
+    Vector *w = vector(sizeof(int), comparator_int, NULL);
     CU_ASSERT_EQUAL(vecpush(w, &x), 0);
     CU_ASSERT_EQUAL(vecpush(w, &x), 0);
-    CU_ASSERT_FALSE(vecequ(v, w, eq_int, NULL));
+    CU_ASSERT_FALSE(vecequ(v, w, NULL));
 
     /* max/min на пустом */
     int maxv; size_t maxi;
-    CU_ASSERT_EQUAL(vecmax(w, value_int, NULL, &maxv, &maxi), 0);
+    CU_ASSERT_EQUAL(vecmax(w, &maxv, &maxi), 0);
     /* w не пуст — но проверим пустой случай отдельно */
-    Vector *e = vector(sizeof(int));
-    CU_ASSERT_NOT_EQUAL(vecmax(e, value_int, NULL, &maxv, &maxi), 0);
-    CU_ASSERT_NOT_EQUAL(vecmin(e, value_int, NULL, &maxv, &maxi), 0);
+    Vector *e = vector(sizeof(int), comparator_int, NULL);
+    CU_ASSERT_NOT_EQUAL(vecmax(e, &maxv, &maxi), 0);
+    CU_ASSERT_NOT_EQUAL(vecmin(e, &maxv, &maxi), 0);
     vecdes(e);
 
     vecdes(v);
@@ -1012,7 +1008,7 @@ void test_end_to_end(void)
 {
     /* "история транзакций": накапливаем, фильтруем, сортируем */
     int initial[] = { 10, -5, 7, 0, 3, -1, 8 };
-    Vector *log = vecfromarr(initial, 7, sizeof(int));
+    Vector *log = vecfromarr(initial, 7, sizeof(int), comparator_int, NULL);
     CU_ASSERT_PTR_NOT_NULL_FATAL(log);
 
     /* добавим ещё транзакций */
@@ -1045,7 +1041,7 @@ void test_end_to_end(void)
         CU_ASSERT_TRUE(*(int *)vecat(log, i) >= 0);
 
     /* сортировка */
-    CU_ASSERT_EQUAL(vecsort(log, value_int, NULL), 0);
+    CU_ASSERT_EQUAL(vecsort(log), 0);
 
     /* проверка монотонности */
     for (size_t i = 1; i < vecsize(log); ++i) {
@@ -1057,7 +1053,7 @@ void test_end_to_end(void)
 
     /* клонируем и сравниваем */
     Vector *snapshot = vecclone(log);
-    CU_ASSERT_TRUE(vecequ(log, snapshot, eq_int, NULL));
+    CU_ASSERT_TRUE(vecequ(log, snapshot, NULL));
 
     /* сжимаем память */
     CU_ASSERT_EQUAL(vecshr(log), 0);
@@ -1065,4 +1061,42 @@ void test_end_to_end(void)
 
     vecdes(snapshot);
     vecdes(log);
+}
+
+static int cmp_scaled(void *a, void *b, void *ctx)
+{
+    int mul = ctx ? *(int *)ctx : 1;
+    int x = *(int *)a * mul;
+    int y = *(int *)b * mul;
+    return (x > y) - (x < y);
+}
+
+void test_copy_preserves_comparator_behavioral(void) {
+    int mul_src = -1;
+
+    Vector *src = vector(sizeof(int), cmp_scaled, &mul_src);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(src);
+
+    int vals[] = { 3, 1, 4, 2, 5 };
+    for (size_t i = 0; i < 5; ++i)
+        CU_ASSERT_EQUAL(vecpush(src, &vals[i]), 0);
+
+    Vector *clone = vecclone(src);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(clone);
+
+    /* Поведенческая проверка: сортируем клон и оригинал —
+       при mul = -1 они должны идти по убыванию. Если ctx потерялся,
+       cmp_scaled получит NULL и mul станет 1 -> порядок возрастёт. */
+    CU_ASSERT_EQUAL(vecsort(src), 0);
+    CU_ASSERT_EQUAL(vecsort(clone), 0);
+
+    for (size_t i = 0; i < 5; ++i)
+        CU_ASSERT_EQUAL(*(int *)vecat(src,   i),
+                        *(int *)vecat(clone, i));
+
+    /* и явно: первый элемент больше последнего (убывание) */
+    CU_ASSERT_TRUE(*(int *)vecat(clone, 0) > *(int *)vecat(clone, 4));
+
+    vecdes(src);
+    vecdes(clone);
 }
