@@ -6,3 +6,5 @@ void test_list_empty(void);
 void test_list_find(void);
 void test_list_at(void);
 void test_list_first_last(void);
+void test_list_for(void);
+void test_list_eraser(void);

@@ -36,5 +36,10 @@ void* listat(List *l, size_t i);
 void* listfront(List *l);
 void* listback(List *l);
 
+int listget(List* l, size_t i, void* out);
+void listfor(List* l, void (*fn)(void* el, void* ctx), void* ctx);
+int listerase(List* l, size_t i);
+int listeraser(List* l, size_t first, size_t last);
+
 
 #endif

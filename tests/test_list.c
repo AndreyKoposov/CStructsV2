@@ -4,6 +4,13 @@
 #include "utils/comparators.h"
 
 
+static void _sum(void* data, void* ctx) {
+    int* n = data;
+    int* sum = ctx;
+    *sum += *n;
+}
+
+
 void test_list_push(void) {
     // Arrange
     List* l = list(sizeof(int), NULL, NULL);
@@ -198,4 +205,67 @@ void test_list_first_last(void) {
     // Clean up
     listdes(l);
     listdes(l2);
+}
+
+void test_list_for(void) {
+    // Arrange
+    List* l = list(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    listpushb(l, &a);
+    listpushb(l, &b);
+    listpushb(l, &c);
+    
+    // Act
+    int sum = 0;
+    listfor(l, _sum, &sum);
+
+    // Assert
+    CU_ASSERT_EQUAL(sum, 10);
+
+    // Clean up
+    listdes(l);
+}
+
+void test_list_eraser(void) {
+    // Arrange
+    List* l1 = list(sizeof(int), comparator_int, NULL);
+    List* l2 = list(sizeof(int), comparator_int, NULL);
+    List* l3 = list(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+
+    listpushb(l1, &a);
+    listpushb(l1, &b);
+    listpushb(l1, &c);
+
+    listpushb(l2, &a);
+    listpushb(l2, &b);
+    listpushb(l2, &c);
+    listpushb(l2, &a);
+    listpushb(l2, &b);
+
+    listpushb(l3, &a);
+
+    
+    // Act
+    int status1 = listeraser(l1, 1, 3);
+    int status2 = listeraser(l2, 1, 4);
+    int status3 = listeraser(l3, 0, 1);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, 0);
+    CU_ASSERT_EQUAL(status3, 0);
+
+    CU_ASSERT_EQUAL(listsize(l1), 1);
+    CU_ASSERT_EQUAL(listsize(l2), 2);
+    CU_ASSERT_EQUAL(listsize(l3), 0);
+
+    // Clean up
+    listdes(l1);
+    listdes(l2);
+    listdes(l3);
 }

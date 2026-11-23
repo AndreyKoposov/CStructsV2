@@ -34,6 +34,26 @@ static LNode* _create_node(List* l, void* data) {
     return n;
 }
 
+static void _destroy_node(List* l, LNode* n, LNode* prev) {
+    LNode* next = n->next;
+    free(n->data);
+    free(n);
+
+    if (l->size == 1) {
+        l->first= NULL;
+    }
+    if (l->size == 2) {
+        l->last = NULL;
+        if (prev)
+            prev->next = next;
+    }
+    if (l->size > 2) {
+        if (prev)
+            prev->next = next;
+    }
+
+    l->size--;
+}
 
 List* list(size_t el_size, comparator comp, void* ctx) {
     if (el_size == 0) return NULL;
@@ -169,8 +189,6 @@ int listremove(List *l, size_t i, void* out) {
     LNode* tmp = l->first;
     LNode* prev = NULL;
     for (size_t c = 0; c < i; c++) {
-        if (!tmp)
-            return -1;
         prev = tmp;
         tmp = tmp->next;
     }
@@ -178,22 +196,7 @@ int listremove(List *l, size_t i, void* out) {
     if (out)
         memcpy(out, tmp->data, l->el_size);
 
-    LNode* next = tmp->next;
-    free(tmp->data);
-    free(tmp);
-
-    if (l->size == 1) {
-        l->first= NULL;
-    }
-    if (l->size == 2) {
-        l->last = NULL;
-        prev->next = next;
-    }
-    if (l->size > 2) {
-        prev->next = next;
-    }
-
-    l->size--;
+    _destroy_node(l, tmp, prev);
 
     return 0;
 }
@@ -239,6 +242,51 @@ void* listback(List *l) {
 
     if (l->size == 1) return l->first->data;
     else return l->last->data;
+}
+
+int listget(List* l, size_t i, void* out) {
+    if (!l || !out) return -1;
+
+    void* data = listat(l, i);
+    if (!data) return -1;
+    memcpy(out, data, l->el_size);
+
+    return 0;
+}
+
+void listfor(List* l, void (*fn)(void* el, void* ctx), void* ctx) {
+    if (!l || !fn) return;
+
+    LNode* n = l->first;
+    while (n) {
+        fn(n->data, ctx);
+        n = n->next;
+    }
+}
+
+int listerase(List* l, size_t i) {
+    return listremove(l, i, NULL);
+}
+
+int listeraser(List* l, size_t first, size_t last) {
+    if (!l || first >= l->size || first >= last || last > l->size) return -1;
+
+    LNode* tmp = l->first;
+    LNode* prev = NULL;
+    size_t c = 0;
+    for (; c < first; c++) {
+        prev = tmp;
+        tmp = tmp->next;
+    }
+    for (; c < last; c++) {
+        LNode* next = tmp->next;
+        _destroy_node(l, tmp, NULL);
+        tmp = next;
+    }
+    if (prev)
+        prev->next = tmp;
+
+    return 0;
 }
 
 size_t listsize(List* l) { return l->size; }
