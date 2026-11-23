@@ -299,3 +299,135 @@ void test_list_clone(void) {
     listdes(l);
     listdes(clone);
 }
+
+void test_list_copy(void) {
+    // Arrange
+    List* l1 = list(sizeof(int), comparator_int, NULL);
+    List* l2 = list(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+
+    listpushb(l1, &a);
+    listpushb(l1, &b);
+    listpushb(l1, &c);
+
+    listpushb(l2, &c);
+    
+    // Act
+    int status = listcpy(l2, l1);
+
+    // Assert
+    int* q1 = listat(l1, 1);
+    int* q2 = listat(l2, 1);
+
+    CU_ASSERT_EQUAL(status, 0);
+    CU_ASSERT_EQUAL(listsize(l1), listsize(l2));
+    CU_ASSERT_EQUAL(*q1, *q2);
+
+    // Clean up
+    listdes(l1);
+    listdes(l2);
+}
+
+void test_list_swap(void) {
+    // Arrange
+    List* l1 = list(sizeof(int), comparator_int, NULL);
+    List* l2 = list(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+
+    listpushb(l1, &a);
+    listpushb(l1, &b);
+    listpushb(l1, &c);
+
+    listpushb(l2, &c);
+
+    size_t s1 = listsize(l1);
+    size_t s2 = listsize(l2);
+    
+    // Act
+    int status = listswp(l1, l2);
+
+    // Assert
+    int* q1 = listat(l1, 0);
+    int* q2 = listat(l2, 0);
+
+    CU_ASSERT_EQUAL(status, 0);
+    CU_ASSERT_EQUAL(listsize(l1), s2);
+    CU_ASSERT_EQUAL(listsize(l2), s1);
+    CU_ASSERT_EQUAL(*q1, 5);
+    CU_ASSERT_EQUAL(*q2, 3);
+
+    // Clean up
+    listdes(l1);
+    listdes(l2);
+}
+
+void test_list_move(void) {
+    // Arrange
+    List* l1 = list(sizeof(int), comparator_int, NULL);
+    List* l2 = list(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+
+    listpushb(l1, &a);
+    listpushb(l1, &b);
+    listpushb(l1, &c);
+
+    listpushb(l2, &c);
+
+    size_t s1 = listsize(l1);
+    
+    // Act
+    int status = listmove(l2, l1);
+
+    // Assert
+    int* q1 = listat(l2, 0);
+
+    CU_ASSERT_EQUAL(status, 0);
+    CU_ASSERT_EQUAL(listsize(l1), 0);
+    CU_ASSERT_EQUAL(listsize(l2), s1);
+    CU_ASSERT_EQUAL(*q1, a);
+
+    // Clean up
+    listdes(l1);
+    listdes(l2);
+}
+
+void test_list_equals(void) {
+    // Arrange
+    List* l1 = list(sizeof(int), comparator_int, NULL);
+    List* l2 = list(sizeof(int), comparator_int, NULL);
+    List* l3 = list(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+
+    listpushb(l1, &a);
+    listpushb(l1, &b);
+    listpushb(l1, &c);
+
+    listpushb(l2, &a);
+    listpushb(l2, &b);
+    listpushb(l2, &c);
+
+    listpushb(l3, &b);
+    listpushb(l3, &a);
+    listpushb(l3, &c);
+    
+    // Act
+    bool eq1 = listeq(l1, l2, NULL);
+    bool eq2 = listeq(l1, l3, NULL);
+
+    // Assert
+    CU_ASSERT(eq1);
+    CU_ASSERT(!eq2);
+
+    // Clean up
+    listdes(l1);
+    listdes(l2);
+    listdes(l3);
+}

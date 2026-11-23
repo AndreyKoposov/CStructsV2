@@ -347,9 +347,7 @@ int listswp(List* a, List* b) {
 int listmove(List* dst, List* src) {
     if (!dst || !src) return -1;
 
-    listcle(dst);
     dst->el_size = src->el_size;
-    dst->size = src->size;
     dst->comp = src->comp;
     dst->ctx = src->ctx;
     listcpy(dst, src);

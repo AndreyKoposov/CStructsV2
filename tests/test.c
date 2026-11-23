@@ -77,6 +77,10 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(listS, "For", test_list_for)) cleanup();
     if (!CU_add_test(listS, "Erase range", test_list_eraser)) cleanup();
     if (!CU_add_test(listS, "Clone", test_list_clone)) cleanup();
+    if (!CU_add_test(listS, "Copy", test_list_copy)) cleanup();
+    if (!CU_add_test(listS, "Swap", test_list_swap)) cleanup();
+    if (!CU_add_test(listS, "Move", test_list_move)) cleanup();
+    if (!CU_add_test(listS, "Equals", test_list_equals)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
 

@@ -9,3 +9,7 @@ void test_list_first_last(void);
 void test_list_for(void);
 void test_list_eraser(void);
 void test_list_clone(void);
+void test_list_copy(void);
+void test_list_swap(void);
+void test_list_move(void);
+void test_list_equals(void);
