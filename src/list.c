@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "structs/list.h"
+#include "structs/vector.h"
 
 
 typedef struct list_node {
@@ -32,6 +33,27 @@ static LNode* _create_node(List* l, void* data) {
     n->next = NULL;
 
     return n;
+}
+
+static void _destroy_node(List* l, LNode* n, LNode* prev) {
+    LNode* next = n->next;
+    free(n->data);
+    free(n);
+
+    if (l->size == 1) {
+        l->first= NULL;
+    }
+    if (l->size == 2) {
+        l->last = NULL;
+        if (prev)
+            prev->next = next;
+    }
+    if (l->size > 2) {
+        if (prev)
+            prev->next = next;
+    }
+
+    l->size--;
 }
 
 
@@ -169,8 +191,6 @@ int listremove(List *l, size_t i, void* out) {
     LNode* tmp = l->first;
     LNode* prev = NULL;
     for (size_t c = 0; c < i; c++) {
-        if (!tmp)
-            return -1;
         prev = tmp;
         tmp = tmp->next;
     }
@@ -178,22 +198,7 @@ int listremove(List *l, size_t i, void* out) {
     if (out)
         memcpy(out, tmp->data, l->el_size);
 
-    LNode* next = tmp->next;
-    free(tmp->data);
-    free(tmp);
-
-    if (l->size == 1) {
-        l->first= NULL;
-    }
-    if (l->size == 2) {
-        l->last = NULL;
-        prev->next = next;
-    }
-    if (l->size > 2) {
-        prev->next = next;
-    }
-
-    l->size--;
+    _destroy_node(l, tmp, prev);
 
     return 0;
 }
@@ -214,6 +219,222 @@ int listfind(List *l, void *data, size_t* out) {
     }
 
     return -1;
+}
+
+void* listat(List *l, size_t i) {
+    if (!l || i >= l->size) return NULL;
+
+    LNode* next = l->first;
+    for (size_t c = 0; c < i; c++) {
+        if (!next) return NULL;
+        next = next->next;
+    }
+
+    return next->data;
+}
+
+void* listfront(List *l) {
+    if (!l || l->size == 0) return NULL;
+    
+    return l->first->data;
+}
+
+void* listback(List *l) {
+    if (!l || l->size == 0) return NULL;
+
+    if (l->size == 1) return l->first->data;
+    else return l->last->data;
+}
+
+int listget(List* l, size_t i, void* out) {
+    if (!l || !out) return -1;
+
+    void* data = listat(l, i);
+    if (!data) return -1;
+    memcpy(out, data, l->el_size);
+
+    return 0;
+}
+
+void listfor(List* l, void (*fn)(void* el, void* ctx), void* ctx) {
+    if (!l || !fn) return;
+
+    LNode* n = l->first;
+    while (n) {
+        fn(n->data, ctx);
+        n = n->next;
+    }
+}
+
+int listerase(List* l, size_t i) {
+    return listremove(l, i, NULL);
+}
+
+int listeraser(List* l, size_t first, size_t last) {
+    if (!l || first >= l->size || first >= last || last > l->size) return -1;
+
+    LNode* tmp = l->first;
+    LNode* prev = NULL;
+    size_t c = 0;
+    for (; c < first; c++) {
+        prev = tmp;
+        tmp = tmp->next;
+    }
+    for (; c < last; c++) {
+        LNode* next = tmp->next;
+        _destroy_node(l, tmp, NULL);
+        tmp = next;
+    }
+    if (prev)
+        prev->next = tmp;
+
+    return 0;
+}
+
+List* listclone(List* src) {
+    if (!src) return NULL;
+
+    List* new = list(src->el_size, src->comp, src->ctx);
+    if (!new) return NULL;
+
+    LNode* n = src->first;
+    while (n) {
+        listpushb(new, n->data);
+        n = n->next;
+    }
+
+    return new;
+}
+
+int listcpy(List* dst, List* src) {
+    if (!dst || !src || src->el_size != dst->el_size) return -1;
+
+    listcle(dst);
+    LNode* n_src = src->first;
+    while (n_src) {
+        listpushb(dst, n_src->data);
+        n_src = n_src->next;
+    }
+
+    return 0;
+}
+
+int listswp(List* a, List* b) {
+    if (!a || !b) return -1;
+
+    LNode* tmp_first = a->first;
+    LNode* tmp_last  = a->last;
+    size_t tmp_el_size = a->el_size;
+    size_t tmp_size = a->size;
+    comparator tmp_comp = a->comp;
+    void* tmp_ctx = a->ctx;
+
+    a->first = b->first;
+    a->last = b->last;
+    a->el_size = b->el_size;
+    a->size = b->size;
+    a->comp = b->comp;
+    a->ctx = b->ctx;
+
+    b->first = tmp_first;
+    b->last = tmp_last;
+    b->el_size = tmp_el_size;
+    b->size = tmp_size;
+    b->comp = tmp_comp;
+    b->ctx = tmp_ctx;
+
+    return 0;
+}
+
+int listmove(List* dst, List* src) {
+    if (!dst || !src) return -1;
+
+    dst->el_size = src->el_size;
+    dst->comp = src->comp;
+    dst->ctx = src->ctx;
+    listcpy(dst, src);
+
+    listcle(src);
+
+    return 0;
+}
+
+bool listeq(List* l1, List* l2, void* ctx) {
+    if (!l1 || !l2 ||  
+        l1->size != l2->size ||
+        l1->el_size != l2->el_size) return false;
+
+    LNode* n1 = l1->first;
+    LNode* n2 = l2->first;
+    while (n1 && n2) {
+        if (l1->comp(n1->data, n2->data, ctx) != 0)
+            return false;
+        n1 = n1->next;
+        n2 = n2->next;
+    }
+
+    return true;
+}
+
+int listmax(List* l, void* out, size_t* i) {
+    if (!l || l->size == 0 || out) return -1;
+
+    void* max = l->first->data;
+    size_t pos = 0;
+    size_t counter = 1;
+    LNode* n = l->first->next;
+    while (n) {
+        if (l->comp(n->data, max, l->ctx) == 1) {
+            max =n->data;
+            pos = counter;
+        }
+        n = n->next;
+        counter++;
+    }
+
+    memcpy(out, max, l->el_size);
+    if (i)
+        *i = pos;
+
+    return 0;
+}
+
+int listmin(List* l, void* out, size_t* i) {
+    if (!l || l->size == 0 || out) return -1;
+
+    void* min = l->first->data;
+    size_t pos = 0;
+    size_t counter = 1;
+    LNode* n = l->first->next;
+    while (n) {
+        if (l->comp(n->data, min, l->ctx) == -1) {
+            min =n->data;
+            pos = counter;
+        }
+        n = n->next;
+        counter++;
+    }
+
+    memcpy(out, min, l->el_size);
+    if (i)
+        *i = pos;
+
+    return 0;
+}
+
+int listsort(List* l) {
+    if (!l) return -1;
+    if (l->size == 0) return 0;
+
+    Vector* stack = vector(sizeof(LNode*));
+
+    LNode* n = l->first;
+    LNode* tmp = NULL;
+    while (n) {
+        tmp = n;
+        n = n->next;
+        tmp->next = NULL;
+    }
 }
 
 size_t listsize(List* l) { return l->size; }
