@@ -108,6 +108,20 @@ void test_list_remove(void) {
     listdes(l);
 }
 
+void test_list_empty(void) {
+    // Arrange
+    List* l = list(sizeof(int), NULL, NULL);
+
+    // Act
+    bool is_empty = listempty(l);
+
+    // Assert
+    CU_ASSERT(is_empty);
+
+    // Clean
+    listdes(l);
+}
+
 void test_list_find(void) {
     // Arrange
     List* l = list(sizeof(int), comparator_int, NULL);
@@ -132,4 +146,56 @@ void test_list_find(void) {
 
     // Clean up
     listdes(l);
+}
+
+void test_list_at(void) {
+    // Arrange
+    List* l = list(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    listpushb(l, &a);
+    listpushb(l, &b);
+    listpushb(l, &c);
+    
+    // Act
+    int* _a = listat(l, 0);
+    int* _b = listat(l, 1);
+    int* _c = listat(l, 2);
+    int* _d = listat(l, 3);
+
+    // Assert
+    CU_ASSERT_EQUAL(*_a, a);
+    CU_ASSERT_EQUAL(*_b, b);
+    CU_ASSERT_EQUAL(*_c, c);
+    CU_ASSERT_PTR_NULL(_d);
+
+    // Clean up
+    listdes(l);
+}
+
+void test_list_first_last(void) {
+    // Arrange
+    List* l = list(sizeof(int), comparator_int, NULL);
+    List* l2 = list(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    listpushb(l, &a);
+    listpushb(l, &b);
+    listpushb(l, &c);
+    
+    // Act
+    int* _a = listfront(l);
+    int* _c = listback(l);
+    int* null = listback(l2);
+
+    // Assert
+    CU_ASSERT_EQUAL(*_a, a);
+    CU_ASSERT_EQUAL(*_c, c);
+    CU_ASSERT_PTR_NULL(null);
+
+    // Clean up
+    listdes(l);
+    listdes(l2);
 }

@@ -70,7 +70,10 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(listS, "Insert", test_list_insert)) cleanup();
     if (!CU_add_test(listS, "Pop front", test_list_pop)) cleanup();
     if (!CU_add_test(listS, "Remove", test_list_remove)) cleanup();
+    if (!CU_add_test(listS, "Empty", test_list_empty)) cleanup();
     if (!CU_add_test(listS, "Find", test_list_find)) cleanup();
+    if (!CU_add_test(listS, "At", test_list_at)) cleanup();
+    if (!CU_add_test(listS, "First/Last", test_list_first_last)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
 

@@ -32,5 +32,9 @@ int listfind(List *l, void *data, size_t* out);
 // Возвращает true, если список пуст
 bool listempty(List *l);
 
+void* listat(List *l, size_t i);
+void* listfront(List *l);
+void* listback(List *l);
+
 
 #endif

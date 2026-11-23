@@ -216,5 +216,30 @@ int listfind(List *l, void *data, size_t* out) {
     return -1;
 }
 
+void* listat(List *l, size_t i) {
+    if (!l || i >= l->size) return NULL;
+
+    LNode* next = l->first;
+    for (size_t c = 0; c < i; c++) {
+        if (!next) return NULL;
+        next = next->next;
+    }
+
+    return next->data;
+}
+
+void* listfront(List *l) {
+    if (!l || l->size == 0) return NULL;
+    
+    return l->first->data;
+}
+
+void* listback(List *l) {
+    if (!l || l->size == 0) return NULL;
+
+    if (l->size == 1) return l->first->data;
+    else return l->last->data;
+}
+
 size_t listsize(List* l) { return l->size; }
 bool listempty(List *l) { return l->size == 0; }
