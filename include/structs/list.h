@@ -55,5 +55,12 @@ int listswp(List* dst, List* src);
 int listmove(List* dst, List* src);
 // Возвращает true, если списки равны, false иначе
 bool listeq(List* l1, List* l2, void* ctx);
+// Пишет значение первого максимального в out и его индекс в i
+int listmax(List* l, void* out, size_t* i);
+// Пишет значение первого минимального в out и его индекс в i
+int listmin(List* l, void* out, size_t* i);
+// Сортирует список по возрастанию
+int listsort(List* l);
+
 
 #endif

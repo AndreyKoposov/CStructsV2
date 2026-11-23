@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "structs/list.h"
+#include "structs/vector.h"
 
 
 typedef struct list_node {
@@ -54,6 +55,7 @@ static void _destroy_node(List* l, LNode* n, LNode* prev) {
 
     l->size--;
 }
+
 
 List* list(size_t el_size, comparator comp, void* ctx) {
     if (el_size == 0) return NULL;
@@ -372,6 +374,67 @@ bool listeq(List* l1, List* l2, void* ctx) {
     }
 
     return true;
+}
+
+int listmax(List* l, void* out, size_t* i) {
+    if (!l || l->size == 0 || out) return -1;
+
+    void* max = l->first->data;
+    size_t pos = 0;
+    size_t counter = 1;
+    LNode* n = l->first->next;
+    while (n) {
+        if (l->comp(n->data, max, l->ctx) == 1) {
+            max =n->data;
+            pos = counter;
+        }
+        n = n->next;
+        counter++;
+    }
+
+    memcpy(out, max, l->el_size);
+    if (i)
+        *i = pos;
+
+    return 0;
+}
+
+int listmin(List* l, void* out, size_t* i) {
+    if (!l || l->size == 0 || out) return -1;
+
+    void* min = l->first->data;
+    size_t pos = 0;
+    size_t counter = 1;
+    LNode* n = l->first->next;
+    while (n) {
+        if (l->comp(n->data, min, l->ctx) == -1) {
+            min =n->data;
+            pos = counter;
+        }
+        n = n->next;
+        counter++;
+    }
+
+    memcpy(out, min, l->el_size);
+    if (i)
+        *i = pos;
+
+    return 0;
+}
+
+int listsort(List* l) {
+    if (!l) return -1;
+    if (l->size == 0) return 0;
+
+    Vector* stack = vector(sizeof(LNode*));
+
+    LNode* n = l->first;
+    LNode* tmp = NULL;
+    while (n) {
+        tmp = n;
+        n = n->next;
+        tmp->next = NULL;
+    }
 }
 
 size_t listsize(List* l) { return l->size; }
