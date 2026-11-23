@@ -1,8 +1,10 @@
+#ifndef VECTOR_H
+#define VECTOR_H
+
 #include <stdlib.h>
 #include <stdbool.h>
 
-#ifndef VECTOR_H
-#define VECTOR_H
+#include "utils/comparators.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,7 +14,7 @@ extern "C" {
 typedef struct vector Vector;
 
 // Создает вектор с элементами размера elem_size
-Vector* vector(size_t elem_size);
+Vector* vector(size_t elem_size, comparator comp, void* ctx);
 // Уничтожает вектор v
 void vecdes(Vector *v);
 // Возвращает размер вектора v
@@ -54,19 +56,21 @@ int veccpy(Vector* dst, Vector* src);
 // Меняет вектора a и b местами
 int vecswp(Vector* a, Vector* b);
 // Сравнивает вектор a с вектором b используя компаратор eq с параметрами ctx
-bool vecequ(Vector* a, Vector* b, bool (*eq)(void*, void*, void* ctx), void* ctx);
+bool vecequ(Vector* a, Vector* b, void* ctx);
 // Передает владение вектором src вектору dst, src обнуляется
 int vecmove(Vector* dst, Vector* src);
 // Возвращает максимальное значение вектора в out и его позицию в i
-int vecmax(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i);
+int vecmax(Vector* a, int* out, size_t* i);
 // Возвращает минимальное значение вектора в out и его позицию в i
-int vecmin(Vector* a, int (*value)(void*, void* ctx), void* ctx, int* out, size_t* i);
+int vecmin(Vector* a, int* out, size_t* i);
 // Сортирует вектор a с помощью функции value
-int vecsort(Vector* a, int (*value)(void*, void* ctx), void* ctx);
+int vecsort(Vector* a);
 // Возвращает указатель на вектор длиной len с элементами размером el_size на основании массива arr
-Vector* vecfromarr(void* arr, size_t len, size_t el_size);
+Vector* vecfromarr(void* arr, size_t len, size_t el_size, comparator comp, void* ctx);
 // Возвращает указатель на массив с данными вектора a
 void* vectoarr(Vector* a);
+// Возвращает 0 при успешном нахождении и -1 при неудаче. Записывает в out индекс первого найденного элемента
+int vecfind(Vector* v, void *data, size_t* out);
 
 
 #ifdef __cplusplus
