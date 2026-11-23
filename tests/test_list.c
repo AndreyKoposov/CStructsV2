@@ -269,3 +269,33 @@ void test_list_eraser(void) {
     listdes(l2);
     listdes(l3);
 }
+
+void test_list_clone(void) {
+    // Arrange
+    List* l = list(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    listpushb(l, &a);
+    listpushb(l, &b);
+    listpushb(l, &c);
+    
+    // Act
+    List* clone = listclone(l);
+    int status1 = listpopf(clone, &a);
+    int status2 = listpopf(clone, &b);
+    int status3 = listpopf(clone, &c);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, 0);
+    CU_ASSERT_EQUAL(status3, 0);
+
+    CU_ASSERT_EQUAL(a, 3);
+    CU_ASSERT_EQUAL(b, 2);
+    CU_ASSERT_EQUAL(c, 5);
+
+    // Clean up
+    listdes(l);
+    listdes(clone);
+}

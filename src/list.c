@@ -289,5 +289,92 @@ int listeraser(List* l, size_t first, size_t last) {
     return 0;
 }
 
+List* listclone(List* src) {
+    if (!src) return NULL;
+
+    List* new = list(src->el_size, src->comp, src->ctx);
+    if (!new) return NULL;
+
+    LNode* n = src->first;
+    while (n) {
+        listpushb(new, n->data);
+        n = n->next;
+    }
+
+    return new;
+}
+
+int listcpy(List* dst, List* src) {
+    if (!dst || !src || src->el_size != dst->el_size) return -1;
+
+    listcle(dst);
+    LNode* n_src = src->first;
+    while (n_src) {
+        listpushb(dst, n_src->data);
+        n_src = n_src->next;
+    }
+
+    return 0;
+}
+
+int listswp(List* a, List* b) {
+    if (!a || !b) return -1;
+
+    LNode* tmp_first = a->first;
+    LNode* tmp_last  = a->last;
+    size_t tmp_el_size = a->el_size;
+    size_t tmp_size = a->size;
+    comparator tmp_comp = a->comp;
+    void* tmp_ctx = a->ctx;
+
+    a->first = b->first;
+    a->last = b->last;
+    a->el_size = b->el_size;
+    a->size = b->size;
+    a->comp = b->comp;
+    a->ctx = b->ctx;
+
+    b->first = tmp_first;
+    b->last = tmp_last;
+    b->el_size = tmp_el_size;
+    b->size = tmp_size;
+    b->comp = tmp_comp;
+    b->ctx = tmp_ctx;
+
+    return 0;
+}
+
+int listmove(List* dst, List* src) {
+    if (!dst || !src) return -1;
+
+    listcle(dst);
+    dst->el_size = src->el_size;
+    dst->size = src->size;
+    dst->comp = src->comp;
+    dst->ctx = src->ctx;
+    listcpy(dst, src);
+
+    listcle(src);
+
+    return 0;
+}
+
+bool listeq(List* l1, List* l2, void* ctx) {
+    if (!l1 || !l2 ||  
+        l1->size != l2->size ||
+        l1->el_size != l2->el_size) return false;
+
+    LNode* n1 = l1->first;
+    LNode* n2 = l2->first;
+    while (n1 && n2) {
+        if (l1->comp(n1->data, n2->data, ctx) != 0)
+            return false;
+        n1 = n1->next;
+        n2 = n2->next;
+    }
+
+    return true;
+}
+
 size_t listsize(List* l) { return l->size; }
 bool listempty(List *l) { return l->size == 0; }
