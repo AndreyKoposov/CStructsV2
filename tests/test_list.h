@@ -20,3 +20,8 @@ void test_list_from_array(void);
 void test_list_link(void);
 void test_list_basic_lifecycle(void);
 void test_list_middle_operations(void);
+void test_list_find_minmax_sort(void);
+void test_list_copy_semantics(void);
+void test_list_array_roundtrip(void);
+void test_list_error_paths(void);
+void test_list_end_to_end(void);

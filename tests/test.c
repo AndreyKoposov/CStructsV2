@@ -90,6 +90,11 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(listS, "Link", test_list_link)) cleanup();
     if (!CU_add_test(listS, "Basic lifecycle", test_list_basic_lifecycle)) cleanup();
     if (!CU_add_test(listS, "Middle operations", test_list_middle_operations)) cleanup();
+    if (!CU_add_test(listS, "Min/Max/Sort", test_list_find_minmax_sort)) cleanup();
+    if (!CU_add_test(listS, "Copy semantics", test_list_copy_semantics)) cleanup();
+    if (!CU_add_test(listS, "Array cycle", test_list_array_roundtrip)) cleanup();
+    if (!CU_add_test(listS, "Errors", test_list_error_paths)) cleanup();
+    if (!CU_add_test(listS, "End to end", test_list_end_to_end)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
 

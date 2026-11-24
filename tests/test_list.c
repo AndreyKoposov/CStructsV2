@@ -5,6 +5,13 @@
 #include "utils/comparators.h"
 
 
+static int _cmp_scaled(void *a, void *b, void *ctx)
+{
+    int mul = ctx ? *(int *)ctx : 1;
+    int x = *(int *)a * mul, y = *(int *)b * mul;
+    return (x > y) - (x < y);
+}
+
 static void _sum(void* data, void* ctx) {
     int* n = data;
     int* sum = ctx;
@@ -21,6 +28,16 @@ static int _list_sum(List *l)
     int s = 0;
     listfor(l, _sum_into, &s);
     return s;
+}
+
+static void _assert_list_equals(List *l, const int *expected, size_t n)
+{
+    CU_ASSERT_EQUAL_FATAL(listsize(l), n);
+    for (size_t i = 0; i < n; ++i) {
+        int v = 0;
+        CU_ASSERT_EQUAL_FATAL(listget(l, i, &v), 0);
+        CU_ASSERT_EQUAL(v, expected[i]);
+    }
 }
 
 
@@ -688,3 +705,245 @@ void test_list_middle_operations(void)
     listdes(l);
 }
 
+void test_list_find_minmax_sort(void) {
+    List *l = list(sizeof(int), comparator_int, NULL);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(l);
+
+    int data[] = { 5, 3, 9, 3, 1, 9, 7 };
+    for (size_t i = 0; i < sizeof(data)/sizeof(data[0]); ++i)
+        CU_ASSERT_EQUAL(listpushb(l, &data[i]), 0);
+
+    /* find: первое вхождение 3 — индекс 1 */
+    int target = 3;
+    size_t pos = (size_t)-1;
+    CU_ASSERT_EQUAL(listfind(l, &target, &pos), 0);
+    CU_ASSERT_EQUAL(pos, 1);
+
+    /* find несуществующего */
+    int missing = 42;
+    CU_ASSERT_NOT_EQUAL(listfind(l, &missing, &pos), 0);
+
+    /* max: 9, первый индекс 2 */
+    int maxv = 0; size_t maxi = (size_t)-1;
+    CU_ASSERT_EQUAL(listmax(l, &maxv, &maxi), 0);
+    CU_ASSERT_EQUAL(maxv, 9);
+    CU_ASSERT_EQUAL(maxi, 2);
+
+    /* min: 1, индекс 4 */
+    int minv = 0; size_t mini = (size_t)-1;
+    CU_ASSERT_EQUAL(listmin(l, &minv, &mini), 0);
+    CU_ASSERT_EQUAL(minv, 1);
+    CU_ASSERT_EQUAL(mini, 4);
+
+    /* sort */
+    CU_ASSERT_EQUAL(listsort(l), 0);
+    int sorted[] = { 1, 3, 3, 5, 7, 9, 9 };
+    _assert_list_equals(l, sorted, 7);
+
+    /* после сортировки min/max на краях */
+    CU_ASSERT_EQUAL(listmin(l, &minv, &mini), 0);
+    CU_ASSERT_EQUAL(mini, 0);
+    CU_ASSERT_EQUAL(listmax(l, &maxv, &maxi), 0);
+    CU_ASSERT_EQUAL(maxi, 5);
+
+    /* max/min на пустом */
+    listcle(l);
+    CU_ASSERT_NOT_EQUAL(listmax(l, &maxv, &maxi), 0);
+    CU_ASSERT_NOT_EQUAL(listmin(l, &minv, &mini), 0);
+
+    listdes(l);
+}
+
+void test_list_copy_semantics(void) {
+    int mul = -1;
+
+    List *src = list(sizeof(int), _cmp_scaled, &mul);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(src);
+
+    for (int i = 1; i <= 5; ++i)
+        CU_ASSERT_EQUAL(listpushb(src, &i), 0);
+
+    /* clone: независимая копия + comp/ctx сохранены */
+    List *clone = listclone(src);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(clone);
+    CU_ASSERT_TRUE(listeq(src, clone, NULL));
+
+    /* изменяем clone — src не должен меняться */
+    int z = 100;
+    CU_ASSERT_EQUAL(listpushb(clone, &z), 0);
+    CU_ASSERT_FALSE(listeq(src, clone, NULL));
+    CU_ASSERT_EQUAL(listsize(src), 5);
+    CU_ASSERT_EQUAL(listsize(clone), 6);
+
+    /* copy: dst получает данные src, comp/ctx тоже */
+    List *dst = list(sizeof(int), comparator_int, NULL);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(dst);
+    CU_ASSERT_EQUAL(listcpy(dst, src), 0);
+    CU_ASSERT_TRUE(listeq(dst, src, NULL));
+
+    /* swap */
+    CU_ASSERT_EQUAL(listswp(dst, clone), 0);
+    CU_ASSERT_EQUAL(listsize(dst), 6);
+    CU_ASSERT_EQUAL(listsize(clone), 5);
+    CU_ASSERT_TRUE(listeq(clone, src, NULL));
+
+    /* move: dst получает владение, src обнуляется */
+    List *moved = list(sizeof(int), comparator_int, NULL);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(moved);
+    CU_ASSERT_EQUAL(listmove(moved, src), 0);
+    CU_ASSERT_TRUE(listeq(moved, clone, NULL));
+    CU_ASSERT_EQUAL(listsize(src), 0);
+    CU_ASSERT_TRUE(listempty(src));
+
+    /* проверяем, что comp_scaled реально доехал: сортировка по убыванию
+       (mul = -1), а не по возрастанию */
+    CU_ASSERT_EQUAL(listsort(moved), 0);
+    /* при mul=-1 «возрастание» = 5,4,3,2,1 */
+    CU_ASSERT_TRUE(*(int *)listat(moved, 0) > *(int *)listat(moved, listsize(moved) - 1));
+
+    listdes(src);
+    listdes(clone);
+    listdes(dst);
+    listdes(moved);
+}
+
+void test_list_array_roundtrip(void) {
+    int arr[] = { 4, 1, 3, 2, 5 };
+
+    List *l = listfromarr(arr, 5, sizeof(int), comparator_int, NULL);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(l);
+    CU_ASSERT_EQUAL(listsize(l), 5);
+    CU_ASSERT_EQUAL(*(int *)listat(l, 0), 4);
+    CU_ASSERT_EQUAL(*(int *)listback(l), 5);
+
+    /* модификация исходного массива не влияет (глубокая копия) */
+    arr[0] = 999;
+    CU_ASSERT_EQUAL(*(int *)listat(l, 0), 4);
+
+    /* сортируем и извлекаем в массив */
+    CU_ASSERT_EQUAL(listsort(l), 0);
+
+    void *raw = listtoarr(l);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(raw);
+    int *out = (int *)raw;
+    for (int i = 0; i < 5; ++i)
+        CU_ASSERT_EQUAL(out[i], i + 1);
+
+    /* если listtoarr возвращает свежий malloc — освобождаем;
+       если внутренний указатель — не трогаем. Проверим, что это не
+       тот же буфер, что listat(0) */
+    if (out != (int *)listat(l, 0))
+        free(out);
+
+    listdes(l);
+}
+
+void test_list_error_paths(void) {
+    List *l = list(sizeof(int), comparator_int, NULL);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(l);
+
+    int x = 1, out = 0;
+
+    /* popf из пустого */
+    CU_ASSERT_NOT_EQUAL(listpopf(l, &out), 0);
+
+    /* remove/erase/eraser на пустом */
+    CU_ASSERT_NOT_EQUAL(listremove(l, 0, &out), 0);
+    CU_ASSERT_NOT_EQUAL(listerase(l, 0), 0);
+    CU_ASSERT_NOT_EQUAL(listeraser(l, 0, 1), 0);
+
+    /* insert в пустой по индексу 0 — допустимо, но по индексу 5 — нет */
+    CU_ASSERT_NOT_EQUAL(listins(l, 5, &x), 0);
+
+    /* eq списков разной длины */
+    List *a = list(sizeof(int), comparator_int, NULL);
+    List *b = list(sizeof(int), comparator_int, NULL);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(a);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(b);
+    listpushb(a, &x);
+    CU_ASSERT_FALSE(listeq(a, b, NULL));
+    listpushb(b, &x);
+    CU_ASSERT_TRUE(listeq(a, b, NULL));
+
+    /* clone пустого */
+    listpopf(b, NULL);
+    List *e = listclone(b);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(e);
+    CU_ASSERT_TRUE(listempty(e));
+    CU_ASSERT_TRUE(listeq(e, b, NULL));
+
+    /* listfromarr с len = 0 */
+    List *z = listfromarr(NULL, 0, sizeof(int), comparator_int, NULL);
+    CU_ASSERT_PTR_NULL(z);
+
+    /* listtoarr пустого — либо NULL, либо валидный пустой буфер */
+    void *raw = listtoarr(z);
+    (void)raw;
+
+    listdes(l);
+    listdes(a);
+    listdes(b);
+    listdes(e);
+    listdes(z);
+}
+
+void test_list_end_to_end(void) {
+    /* сценарий: «журнал событий» — накапливаем, фильтруем, сортируем,
+       клонируем снимок, сливаем с дополнительным журналом */
+
+    int initial[] = { 10, -5, 7, 0, 3, -1, 8 };
+    List *log = listfromarr(initial, 7, sizeof(int), comparator_int, NULL);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(log);
+
+    /* добавим ещё событий в начало и конец */
+    int first = 100;
+    listpushf(log, &first);
+    int last_arr[] = { 4, -2, 6 };
+    for (int i = 0; i < 3; ++i)
+        listpushb(log, &last_arr[i]);
+
+    CU_ASSERT_EQUAL(listsize(log), 11);
+
+    /* удалим отрицательные через итерацию с конца:
+       listremove сохраняет стабильность индексов, идём с конца */
+    for (size_t i = listsize(log); i > 0; --i) {
+        int v = 0;
+        CU_ASSERT_EQUAL(listget(log, i - 1, &v), 0);
+        if (v < 0)
+            CU_ASSERT_EQUAL(listerase(log, i - 1), 0);
+    }
+
+    /* все >= 0 */
+    for (size_t i = 0; i < listsize(log); ++i)
+        CU_ASSERT_TRUE(*(int *)listat(log, i) >= 0);
+
+    /* сортируем */
+    CU_ASSERT_EQUAL(listsort(log), 0);
+    for (size_t i = 1; i < listsize(log); ++i) {
+        int prev = 0, cur = 0;
+        listget(log, i - 1, &prev);
+        listget(log, i, &cur);
+        CU_ASSERT_TRUE(prev <= cur);
+    }
+
+    /* клонируем снимок */
+    List *snapshot = listclone(log);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(snapshot);
+    CU_ASSERT_TRUE(listeq(log, snapshot, NULL));
+
+    /* сливаем с дополнительным журналом */
+    int extra[] = { 50, 2, 70 };
+    List *extra_l = listfromarr(extra, 3, sizeof(int), comparator_int, NULL);
+    CU_ASSERT_EQUAL(listlink(snapshot, extra_l), 0);
+    CU_ASSERT_EQUAL(listsize(snapshot), listsize(log) + 3);
+
+    /* min/max на объединённом */
+    int mn = 0, mx = 0; size_t mni, mxi;
+    CU_ASSERT_EQUAL(listmin(snapshot, &mn, &mni), 0);
+    CU_ASSERT_EQUAL(listmax(snapshot, &mx, &mxi), 0);
+    CU_ASSERT_EQUAL(mn, 0);
+    CU_ASSERT_EQUAL(mx, 100);
+
+    listdes(log);
+    listdes(snapshot);
+}
