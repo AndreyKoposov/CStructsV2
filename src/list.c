@@ -532,5 +532,60 @@ int listsort(List* l) {
     return 0;
 }
 
+void* listtoarr(List* l) {
+    if (!l) return NULL;
+
+    char* arr = malloc(l->size * l->el_size);
+    if (!arr) return NULL;
+
+    LNode* n = l->first;
+    size_t counter = 0;
+    while (n) {
+        memcpy(arr + counter*l->el_size, n->data, l->el_size);
+        n = n->next;
+        counter++;
+    }
+
+    return arr;
+}
+
+List* listfromarr(void* arr, size_t len, size_t el_size, comparator comp, void* ctx) {
+    if (!arr) return NULL;
+
+    List* l = list(el_size, comp, ctx);
+
+    char* bytes = arr;
+    char* buffer = malloc(el_size);
+    if  (!buffer) return NULL;
+
+    for (size_t i = 0; i < len; i++) {
+        memcpy(buffer, bytes + i*el_size, el_size);
+        listpushb(l, buffer);
+    }
+
+    free(buffer);
+
+    return l;
+}
+
+int listlink(List* l1, List* l2) {
+    if (!l1 || !l2 || l1->el_size != l2->el_size) return -1;
+    if (l1->size == 0 && l2->size == 0) return 0;
+
+    if (l1->size == 0)
+        l1->first = l2->first;
+    if (l1->size == 1)
+        l1->first->next = l2->first;
+    if (l1->size > 1)
+        l1->last->next = l2->first;
+
+    l1->last = l2->last;
+    l1->size += l2->size;
+
+    free(l2);
+
+    return 0;
+}
+
 size_t listsize(List* l) { return l->size; }
 bool listempty(List *l) { return l->size == 0; }

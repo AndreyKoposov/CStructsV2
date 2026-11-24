@@ -15,3 +15,6 @@ void test_list_move(void);
 void test_list_equals(void);
 void test_list_min_max(void);
 void test_list_sort(void);
+void test_list_to_array(void);
+void test_list_from_array(void);
+void test_list_link(void);

@@ -61,6 +61,12 @@ int listmax(List* l, void* out, size_t* i);
 int listmin(List* l, void* out, size_t* i);
 // Сортирует список по возрастанию
 int listsort(List* l);
+// Возвращает указательь на массив данными списка
+void* listtoarr(List* l);
+// Возвращает указатель на список с данными массива
+List* listfromarr(void* arr, size_t len, size_t el_size, comparator comp, void* ctx);
+// Связывает список l1 со списком l2, l2 после слияния удаляется
+int listlink(List* l1, List* l2);
 
 
 #endif

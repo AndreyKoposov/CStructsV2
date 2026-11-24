@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <CUnit/Basic.h>
 
 #include "structs/list.h"
@@ -494,6 +495,81 @@ void test_list_sort(void) {
     CU_ASSERT_EQUAL(*(int*)listat(l1, 2), 3);
     CU_ASSERT_EQUAL(*(int*)listat(l1, 3), 5);
     CU_ASSERT_EQUAL(*(int*)listat(l1, 4), 15);
+
+    // Clean up
+    listdes(l1);
+}
+
+void test_list_to_array(void) {
+    // Arrange
+    List* l = list(sizeof(int), comparator_int, NULL);
+    int a = 0, b = 1, c = 2, d = 3, e= 4;
+
+    listpushb(l, &a);
+    listpushb(l, &b);
+    listpushb(l, &c);
+    listpushb(l, &d);
+    listpushb(l, &e);
+
+    // Act
+    int* arr = listtoarr(l);
+
+    // Assert
+    CU_ASSERT_EQUAL(arr[0], *(int*)listat(l, 0));
+    CU_ASSERT_EQUAL(arr[1], *(int*)listat(l, 1));
+    CU_ASSERT_EQUAL(arr[2], *(int*)listat(l, 2));
+    CU_ASSERT_EQUAL(arr[3], *(int*)listat(l, 3));
+    CU_ASSERT_EQUAL(arr[4], *(int*)listat(l, 4));
+
+    // Clean up
+    free(arr);
+    listdes(l);
+}
+
+void test_list_from_array(void) {
+    // Arrange
+    int a[] = {1,2,3,4,5};
+
+    // Act
+    List* l = listfromarr(a, 5, sizeof(int), comparator_int, NULL);
+
+    // Assert
+    CU_ASSERT_PTR_NOT_NULL(l);
+
+    CU_ASSERT_EQUAL(*(int*)listat(l, 0), a[0]);
+    CU_ASSERT_EQUAL(*(int*)listat(l, 1), a[1]);
+    CU_ASSERT_EQUAL(*(int*)listat(l, 2), a[2]);
+    CU_ASSERT_EQUAL(*(int*)listat(l, 3), a[3]);
+    CU_ASSERT_EQUAL(*(int*)listat(l, 4), a[4]);
+
+    // Clean up
+    listdes(l);
+}
+
+void test_list_link(void) {
+    // Arrange
+    List* l1 = list(sizeof(int), comparator_int, NULL);
+    List* l2 = list(sizeof(int), comparator_int, NULL);
+
+    int a = 1;
+    int b = 2;
+    int c = 3;
+    int d = 4;
+
+    listpushb(l1, &a);
+    listpushb(l1, &b);
+
+    listpushb(l2, &c);
+    listpushb(l2, &d);
+
+    // Act
+    int status = listlink(l1, l2);
+
+    // Assert
+    CU_ASSERT_EQUAL(status, 0);
+
+    CU_ASSERT_EQUAL(*(int*)listat(l1, 0), 1);
+    CU_ASSERT_EQUAL(*(int*)listat(l1, 3), 4);
 
     // Clean up
     listdes(l1);
