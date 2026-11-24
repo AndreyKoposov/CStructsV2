@@ -11,6 +11,18 @@ static void _sum(void* data, void* ctx) {
     *sum += *n;
 }
 
+static void _sum_into(void *el, void *ctx)
+{
+    *(int *)ctx += *(int *)el;
+}
+
+static int _list_sum(List *l)
+{
+    int s = 0;
+    listfor(l, _sum_into, &s);
+    return s;
+}
+
 
 void test_list_push(void) {
     // Arrange
@@ -574,3 +586,105 @@ void test_list_link(void) {
     // Clean up
     listdes(l1);
 }
+
+void test_list_basic_lifecycle(void)
+{
+    List *l = list(sizeof(int), comparator_int, NULL);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(l);
+
+    CU_ASSERT_EQUAL(listsize(l), 0);
+    CU_ASSERT_TRUE(listempty(l));
+    CU_ASSERT_PTR_NULL(listfront(l));
+    CU_ASSERT_PTR_NULL(listback(l));
+
+    int a = 10, b = 20, c = 30;
+    CU_ASSERT_EQUAL(listpushf(l, &a), 0);   /* [10] */
+    CU_ASSERT_EQUAL(listpushb(l, &b), 0);   /* [10,20] */
+    CU_ASSERT_EQUAL(listpushf(l, &c), 0);   /* [30,10,20] */
+
+    CU_ASSERT_EQUAL(listsize(l), 3);
+    CU_ASSERT_FALSE(listempty(l));
+
+    CU_ASSERT_EQUAL(*(int *)listfront(l), 30);
+    CU_ASSERT_EQUAL(*(int *)listback(l),  20);
+    CU_ASSERT_EQUAL(*(int *)listat(l, 1), 10);
+
+    int out = 0;
+    CU_ASSERT_EQUAL(listget(l, 2, &out), 0);
+    CU_ASSERT_EQUAL(out, 20);
+
+    /* get вне диапазона */
+    CU_ASSERT_NOT_EQUAL(listget(l, 3, &out), 0);
+
+    /* at вне диапазона */
+    CU_ASSERT_PTR_NULL(listat(l, 3));
+
+    /* очистка */
+    listcle(l);
+    CU_ASSERT_EQUAL(listsize(l), 0);
+    CU_ASSERT_TRUE(listempty(l));
+
+    listdes(l);
+}
+
+void test_list_middle_operations(void)
+{
+    List *l = list(sizeof(int), comparator_int, NULL);
+    CU_ASSERT_PTR_NOT_NULL_FATAL(l);
+
+    for (int i = 0; i < 6; ++i)
+        CU_ASSERT_EQUAL(listpushb(l, &i), 0);   /* [0..5] */
+
+    /* insert в начало */
+    int neg = -1;
+    CU_ASSERT_EQUAL(listins(l, 0, &neg), 0);    /* [-1,0,1,2,3,4,5] */
+    CU_ASSERT_EQUAL(*(int *)listfront(l), -1);
+
+    /* insert в середину */
+    int x = 99;
+    CU_ASSERT_EQUAL(listins(l, 3, &x), 0);      /* [-1,0,1,99,2,3,4,5] */
+    CU_ASSERT_EQUAL(*(int *)listat(l, 3), 99);
+
+    /* insert в конец (позиция == size) */
+    int y = 100;
+    CU_ASSERT_EQUAL(listins(l, listsize(l), &y), 0);
+    CU_ASSERT_EQUAL(*(int *)listback(l), 100);
+
+    /* insert за границу — ошибка */
+    CU_ASSERT_NOT_EQUAL(listins(l, listsize(l) + 1, &y), 0);
+
+    /* popf */
+    int out = 0;
+    CU_ASSERT_EQUAL(listpopf(l, &out), 0);
+    CU_ASSERT_EQUAL(out, -1);
+    CU_ASSERT_EQUAL(listsize(l), 8);
+
+    /* remove из середины */
+    CU_ASSERT_EQUAL(listremove(l, 2, &out), 0);  /* удалили 99 */
+    CU_ASSERT_EQUAL(out, 99);
+
+    /* erase по индексу */
+    CU_ASSERT_EQUAL(listerase(l, 0), 0);         /* удалили 0 */
+
+    /* eraser диапазона [1, 3) */
+    CU_ASSERT_EQUAL(listeraser(l, 1, 3), 0);
+
+    /* проверяем итоговый размер и согласованность first/last */
+    size_t n = listsize(l);
+    CU_ASSERT_EQUAL(*(int *)listfront(l), 1);
+    CU_ASSERT_EQUAL(*(int *)listback(l), 100);
+    /* сумма size должна совпадать с ручным подсчётом через at */
+    int acc = 0;
+    for (size_t i = 0; i < n; ++i) acc += *(int *)listat(l, i);
+    CU_ASSERT_EQUAL(acc, _list_sum(l));
+
+    /* remove вне диапазона */
+    CU_ASSERT_NOT_EQUAL(listremove(l, n, &out), 0);
+
+    /* eraser с некорректными границами */
+    CU_ASSERT_NOT_EQUAL(listeraser(l, 2, 1), 0);
+    CU_ASSERT_NOT_EQUAL(listeraser(l, 0, n + 1), 0);
+
+    listdes(l);
+}
+

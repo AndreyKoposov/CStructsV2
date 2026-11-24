@@ -36,22 +36,22 @@ static LNode* _create_node(List* l, void* data) {
 }
 
 static void _destroy_node(List* l, LNode* n, LNode* prev) {
+    if (!l || !n) return;
+
     LNode* next = n->next;
+
+    if (n == l->first)
+        l->first = next;
+    else
+    if (n == l->last && prev) {
+        l->last = prev;
+        prev->next = NULL;
+    }
+    else if (prev)
+        prev->next = next;
+
     free(n->data);
     free(n);
-
-    if (l->size == 1) {
-        l->first= NULL;
-    }
-    if (l->size == 2) {
-        l->last = NULL;
-        if (prev)
-            prev->next = next;
-    }
-    if (l->size > 2) {
-        if (prev)
-            prev->next = next;
-    }
 
     l->size--;
 }
@@ -203,21 +203,19 @@ int listpushb(List *l, void *data) {
 }
 
 int listins(List *l, size_t i, void *data) {
-    if (!l || !data || i >= l->size) return -1;
+    if (!l || !data || i > l->size) return -1;
 
     LNode* tmp = l->first;
     LNode* prev = NULL;
     for (size_t c = 0; c < i; c++) {
-        if (!tmp)
-            return -1;
         prev = tmp;
         tmp = tmp->next;
     }
 
+    if (!tmp)
+        return listpushb(l, data);
     if (tmp == l->first)
         return listpushf(l, data);
-    if (tmp == l->last)
-        return listpushb(l, data);
     
     LNode* n = _create_node(l, data);
     if (!n) return -1;

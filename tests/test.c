@@ -88,6 +88,8 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(listS, "To array", test_list_to_array)) cleanup();
     if (!CU_add_test(listS, "From array", test_list_from_array)) cleanup();
     if (!CU_add_test(listS, "Link", test_list_link)) cleanup();
+    if (!CU_add_test(listS, "Basic lifecycle", test_list_basic_lifecycle)) cleanup();
+    if (!CU_add_test(listS, "Middle operations", test_list_middle_operations)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
 

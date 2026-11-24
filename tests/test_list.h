@@ -18,3 +18,5 @@ void test_list_sort(void);
 void test_list_to_array(void);
 void test_list_from_array(void);
 void test_list_link(void);
+void test_list_basic_lifecycle(void);
+void test_list_middle_operations(void);
