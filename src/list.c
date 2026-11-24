@@ -56,6 +56,65 @@ static void _destroy_node(List* l, LNode* n, LNode* prev) {
     l->size--;
 }
 
+static int _add_node(List* l, LNode* n) {
+    if (!l || !n) return -1;
+
+    if (l->size == 0)
+        l->first = n;
+    if (l->size == 1) {
+        l->first->next = n;
+        l->last = n;
+    }
+    if (l->size > 1) {
+        l->last->next = n;
+        l->last = n;
+    }
+
+    l->size++;
+
+    return 0;
+}
+
+static List* _list_from_node(LNode* n, size_t el_size, comparator comp, void* ctx) {
+    List* l = list(el_size, comp, ctx);
+
+    if (_add_node(l, n) == -1) return NULL;
+
+    return l;
+}
+
+static List* _link_lists_sorted(List* l1, List* l2) {
+    if (!l1 || !l2 || l1->el_size != l2->el_size) return NULL;
+
+    List* l3 = list(l1->el_size, l1->comp, l1->ctx);
+
+    LNode* n1 = l1->first;
+    LNode* n2 = l2->first;
+    while (n1 && n2) {
+        if (l1->comp(n1->data, n2->data, l1->ctx) == -1) {
+            _add_node(l3, n1);
+            n1 = n1->next;
+        }
+        else {
+            _add_node(l3, n2);
+            n2 = n2->next;
+        }
+    }
+    while (n2) {
+        _add_node(l3, n2);
+        n2 = n2->next;
+    }
+    while (n1) {
+        _add_node(l3, n1);
+        n1 = n1->next;
+    }
+
+    free(l1);
+    free(l2);
+
+    return l3;
+}
+
 
 List* list(size_t el_size, comparator comp, void* ctx) {
     if (el_size == 0) return NULL;
@@ -377,7 +436,7 @@ bool listeq(List* l1, List* l2, void* ctx) {
 }
 
 int listmax(List* l, void* out, size_t* i) {
-    if (!l || l->size == 0 || out) return -1;
+    if (!l || l->size == 0 || !out) return -1;
 
     void* max = l->first->data;
     size_t pos = 0;
@@ -400,7 +459,7 @@ int listmax(List* l, void* out, size_t* i) {
 }
 
 int listmin(List* l, void* out, size_t* i) {
-    if (!l || l->size == 0 || out) return -1;
+    if (!l || l->size == 0 || !out) return -1;
 
     void* min = l->first->data;
     size_t pos = 0;
@@ -426,15 +485,51 @@ int listsort(List* l) {
     if (!l) return -1;
     if (l->size == 0) return 0;
 
-    Vector* stack = vector(sizeof(LNode*));
+    Vector* stack = vector(sizeof(List*), NULL, NULL);
 
     LNode* n = l->first;
     LNode* tmp = NULL;
+    List* part = NULL;
     while (n) {
         tmp = n;
         n = n->next;
         tmp->next = NULL;
+
+        part = _list_from_node(tmp, l->el_size, l->comp, l->ctx);
+        vecpush(stack, &part);
+
+        while (vecsize(stack) >= 2) {
+            List** top1 = vecat(stack, vecsize(stack)-1);
+            List** top2 = vecat(stack, vecsize(stack)-2);
+
+            if ((*top1)->size != (*top2)->size) break;
+
+            List *l1, *l2, *l3;
+            vecpop(stack, &l1);
+            vecpop(stack, &l2);
+
+            l3 = _link_lists_sorted(l1, l2);
+            vecpush(stack, &l3);
+        }
     }
+
+    List* l1, *l2, *l3;
+    while (vecsize(stack) > 1) {
+        vecpop(stack, &l1);
+        vecpop(stack, &l2);
+
+        l3 = _link_lists_sorted(l1, l2);
+        vecpush(stack, &l3);
+    }
+
+    List* merged;
+    vecpop(stack, &merged);
+    listswp(merged, l);
+
+    vecdes(stack);
+    free(merged);
+
+    return 0;
 }
 
 size_t listsize(List* l) { return l->size; }

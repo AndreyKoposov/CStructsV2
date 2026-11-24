@@ -13,3 +13,5 @@ void test_list_copy(void);
 void test_list_swap(void);
 void test_list_move(void);
 void test_list_equals(void);
+void test_list_min_max(void);
+void test_list_sort(void);

@@ -431,3 +431,70 @@ void test_list_equals(void) {
     listdes(l2);
     listdes(l3);
 }
+
+void test_list_min_max(void) {
+    // Arrange
+    List* l1 = list(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    int d = -2;
+    int e = 15;
+
+    listpushb(l1, &a);
+    listpushb(l1, &b);
+    listpushb(l1, &c);
+    listpushb(l1, &d);
+    listpushb(l1, &e);
+
+    int max, min;
+    size_t max_pos, min_pos;
+
+    // Act
+    int status1 = listmax(l1, &max, &max_pos);
+    int status2 = listmin(l1, &min, &min_pos);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, 0);
+
+    CU_ASSERT_EQUAL(max, 15);
+    CU_ASSERT_EQUAL(max_pos, 4);
+
+    CU_ASSERT_EQUAL(min, -2);
+    CU_ASSERT_EQUAL(min_pos, 3);
+
+    // Clean up
+    listdes(l1);
+}
+
+void test_list_sort(void) {
+    // Arrange
+    List* l1 = list(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    int d = -2;
+    int e = 15;
+
+    listpushb(l1, &a);
+    listpushb(l1, &b);
+    listpushb(l1, &c);
+    listpushb(l1, &d);
+    listpushb(l1, &e);
+
+    // Act
+    int status = listsort(l1);
+
+    // Assert
+    CU_ASSERT_EQUAL(status, 0);
+
+    CU_ASSERT_EQUAL(*(int*)listat(l1, 0), -2);
+    CU_ASSERT_EQUAL(*(int*)listat(l1, 1), 2);
+    CU_ASSERT_EQUAL(*(int*)listat(l1, 2), 3);
+    CU_ASSERT_EQUAL(*(int*)listat(l1, 3), 5);
+    CU_ASSERT_EQUAL(*(int*)listat(l1, 4), 15);
+
+    // Clean up
+    listdes(l1);
+}

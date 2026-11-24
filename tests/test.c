@@ -83,6 +83,8 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(listS, "Swap", test_list_swap)) cleanup();
     if (!CU_add_test(listS, "Move", test_list_move)) cleanup();
     if (!CU_add_test(listS, "Equals", test_list_equals)) cleanup();
+    if (!CU_add_test(listS, "Max/Min", test_list_min_max)) cleanup();
+    if (!CU_add_test(listS, "Sort", test_list_sort)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
 
