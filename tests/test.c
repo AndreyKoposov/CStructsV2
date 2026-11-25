@@ -83,6 +83,18 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(listS, "Swap", test_list_swap)) cleanup();
     if (!CU_add_test(listS, "Move", test_list_move)) cleanup();
     if (!CU_add_test(listS, "Equals", test_list_equals)) cleanup();
+    if (!CU_add_test(listS, "Max/Min", test_list_min_max)) cleanup();
+    if (!CU_add_test(listS, "Sort", test_list_sort)) cleanup();
+    if (!CU_add_test(listS, "To array", test_list_to_array)) cleanup();
+    if (!CU_add_test(listS, "From array", test_list_from_array)) cleanup();
+    if (!CU_add_test(listS, "Link", test_list_link)) cleanup();
+    if (!CU_add_test(listS, "Basic lifecycle", test_list_basic_lifecycle)) cleanup();
+    if (!CU_add_test(listS, "Middle operations", test_list_middle_operations)) cleanup();
+    if (!CU_add_test(listS, "Min/Max/Sort", test_list_find_minmax_sort)) cleanup();
+    if (!CU_add_test(listS, "Copy semantics", test_list_copy_semantics)) cleanup();
+    if (!CU_add_test(listS, "Array cycle", test_list_array_roundtrip)) cleanup();
+    if (!CU_add_test(listS, "Errors", test_list_error_paths)) cleanup();
+    if (!CU_add_test(listS, "End to end", test_list_end_to_end)) cleanup();
 
     CU_basic_set_mode(CU_BRM_VERBOSE);
 
