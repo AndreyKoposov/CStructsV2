@@ -2,25 +2,31 @@
 #include <string.h>
 
 #include "structs/vector.h"
+#include "structs/list.h"
 #include "structs/btree.h"
 
 
-typedef struct node {
+typedef struct btree_node {
     void* data;
-    struct node* left;
-    struct node* right;
-} Node;
+    struct btree_node* left;
+    struct btree_node* right;
+} BNode;
 
 typedef struct btree {
-    Node* head;
+    BNode* head;
     size_t size;
     size_t el_size;
     comparator comp;
     void* ctx;
 } BTree;
 
-Node* _create_node(BTree* t, void* data) {
-    Node* node = malloc(sizeof(Node));
+typedef struct _post_order_element {
+    BNode* node;
+    bool visited;
+} _POE;
+
+BNode* _create_node(BTree* t, void* data) {
+    BNode* node = malloc(sizeof(BNode));
     if (!node) return NULL;
 
     node->data = malloc(t->el_size);
@@ -35,6 +41,112 @@ Node* _create_node(BTree* t, void* data) {
     node->right = NULL;
 
     return node;
+}
+
+void _free_node(void* data, void* ctx) {
+    BNode* n = data;
+    (void)ctx;
+
+    free(n->data);
+    free(n);
+}
+
+int _dfs_preorder(BTree* t, void (*fn)(void*, void*), void* ctx) {
+    if (!t || !fn) return -1;
+    if (!t->head) return 0;
+
+    Vector* stack = vector(sizeof(BNode*), NULL, NULL);
+    BNode* tmp = NULL;
+
+    vecpush(stack, &t->head);
+    while(vecsize(stack) > 0) {
+        vecpop(stack, &tmp);
+
+        fn(tmp->data, ctx);
+
+        if (tmp->right) vecpush(stack, &tmp->right);
+        if (tmp->left) vecpush(stack, &tmp->left);
+    }
+
+    vecdes(stack);
+
+    return 0;
+}
+
+int _dfs_inorder(BTree* t, void (*fn)(void*, void*), void* ctx) {
+    if (!t || !fn) return -1;
+    if (!t->head) return 0;
+
+    Vector* stack = vector(sizeof(BNode*), NULL, NULL);
+    BNode* current = t->head;
+
+    while (current || vecsize(stack) > 0) {
+        while (current) {
+            vecpush(stack, current->left);
+            current = current->left;
+        }
+        vecpop(stack, &current);
+        fn(current->data, ctx);
+        current = current->right;
+    }
+    vecdes(stack);
+
+    return 0;
+}
+
+int _dfs_postorder(BTree* t, void (*fn)(void*, void*), void* ctx) {
+    if (!t || !fn) return -1;
+    if (!t->head) return 0;
+
+    Vector* stack = vector(sizeof(_POE), NULL, NULL);
+    _POE tmp = {t->head, false};
+
+    vecpush(stack, &tmp);
+    while(vecsize(stack) > 0) {
+        vecpop(stack, &tmp);
+
+        if (!tmp.visited) {
+            tmp.visited = true;
+            vecpush(stack, &tmp);
+
+            if (tmp.node->right) {
+                _POE new = {tmp.node->right, false};
+                vecpush(stack, &new);
+            }
+
+            if (tmp.node->left) {
+                _POE new = {tmp.node->left, false};
+                vecpush(stack, &new);
+            }
+        } else
+            fn(tmp.node, ctx);
+    }
+
+    vecdes(stack);
+
+    return 0;
+}
+
+int _bfs(BTree* t, void (*fn)(void*, void*), void* ctx) {
+    if (!t || !fn) return -1;
+    if (!t->head) return 0;
+
+    List* queue = list(sizeof(BNode*), NULL, NULL);
+    BNode* tmp = NULL;
+
+    listpushb(queue, &t->head);
+    while (listsize(queue) > 0) {
+        listpopf(queue, &tmp);
+
+        fn(tmp, ctx);
+
+        if (tmp->left) listpushb(queue, &tmp->left);
+        if (tmp->right) listpushb(queue, &tmp->right);
+    }
+
+    listdes(queue);
+
+    return 0;
 }
 
 
@@ -53,32 +165,15 @@ BTree* btree(size_t el_size, comparator comp, void* ctx) {
 
 void btreedes(BTree* t) {
     if (!t) return;
-    if (!t->head) {
-        free(t);
-        return;
-    }
 
-    Vector* v = vector(sizeof(Node*), NULL, NULL);
-    vecpush(v, &t->head);
-
-    Node* tmp;
-    while (vecsize(v) > 0) {
-        vecpop(v, &tmp);
-
-        if (tmp->left) vecpush(v, &tmp->left);
-        if (tmp->right) vecpush(v, &tmp->right);
-
-        free(tmp->data);
-        free(tmp);
-    }
-    vecdes(v);
+    _dfs_postorder(t, _free_node, NULL);
     free(t);
 }
 
 void* btreesrch(BTree* t, void* data) {
     if (!t || !data || !t->head) return NULL;
 
-    Node* tmp = t->head;
+    BNode* tmp = t->head;
     while (tmp) {
         int c = t->comp(data, tmp->data, t->ctx);
         if (c == 0) return tmp->data;
@@ -98,7 +193,7 @@ int btreeins(BTree* t, void* data) {
         return 0;
     }
 
-    Node* tmp = t->head;
+    BNode* tmp = t->head;
     while (tmp) {
         int c = t->comp(data, tmp->data, t->ctx);
         if (c == 0) return -1;
