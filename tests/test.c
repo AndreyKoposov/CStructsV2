@@ -66,7 +66,9 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(vectorS, "Comparator copy", test_copy_preserves_comparator_behavioral)) cleanup();
 
     if (!CU_add_test(btreeS, "Insert", test_btree_insert)) cleanup();
-    if (!CU_add_test(btreeS, "Search", test_btree_search)) cleanup();
+    if (!CU_add_test(btreeS, "Contains", test_btree_contains)) cleanup();
+    // if (!CU_add_test(btreeS, "Delete", test_btree_delete)) cleanup();
+    if (!CU_add_test(btreeS, "Clone", test_btree_clone)) cleanup();
 
     if (!CU_add_test(listS, "Push front/back", test_list_push)) cleanup();
     if (!CU_add_test(listS, "Insert", test_list_insert)) cleanup();

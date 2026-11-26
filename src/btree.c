@@ -25,68 +25,28 @@ typedef struct _post_order_element {
     bool visited;
 } _POE;
 
-BNode* _create_node(BTree* t, void* data) {
-    BNode* node = malloc(sizeof(BNode));
-    if (!node) return NULL;
+typedef struct _frame {
+    BNode* origin;
+    BNode* clone;
+} _Frame;
 
-    node->data = malloc(t->el_size);
-    if (!node->data) {
-        free(node);
-        return NULL;
-    }
 
-    memcpy(node->data, data, t->el_size);
-
-    node->left = NULL;
-    node->right = NULL;
-
-    return node;
-}
-
-void _free_node(void* data, void* ctx) {
-    BNode* n = data;
-    (void)ctx;
-
-    free(n->data);
-    free(n);
-}
-
-int _dfs_preorder(BTree* t, void (*fn)(void*, void*), void* ctx) {
-    if (!t || !fn) return -1;
-    if (!t->head) return 0;
-
-    Vector* stack = vector(sizeof(BNode*), NULL, NULL);
-    BNode* tmp = NULL;
-
-    vecpush(stack, &t->head);
-    while(vecsize(stack) > 0) {
-        vecpop(stack, &tmp);
-
-        fn(tmp->data, ctx);
-
-        if (tmp->right) vecpush(stack, &tmp->right);
-        if (tmp->left) vecpush(stack, &tmp->left);
-    }
-
-    vecdes(stack);
-
-    return 0;
-}
-
-int _dfs_inorder(BTree* t, void (*fn)(void*, void*), void* ctx) {
+static int _dfs_inorder(BTree* t, void (*fn)(BNode*, BTree*, size_t, void*), void* ctx) {
     if (!t || !fn) return -1;
     if (!t->head) return 0;
 
     Vector* stack = vector(sizeof(BNode*), NULL, NULL);
     BNode* current = t->head;
+    size_t i = 0;
 
     while (current || vecsize(stack) > 0) {
         while (current) {
-            vecpush(stack, current->left);
+            vecpush(stack, current);
             current = current->left;
         }
         vecpop(stack, &current);
-        fn(current->data, ctx);
+        fn(current, t, i, ctx);
+        i++;
         current = current->right;
     }
     vecdes(stack);
@@ -94,7 +54,7 @@ int _dfs_inorder(BTree* t, void (*fn)(void*, void*), void* ctx) {
     return 0;
 }
 
-int _dfs_postorder(BTree* t, void (*fn)(void*, void*), void* ctx) {
+static int _dfs_postorder(BTree* t, void (*fn)(BNode*, BTree* , void*), void* ctx) {
     if (!t || !fn) return -1;
     if (!t->head) return 0;
 
@@ -119,7 +79,7 @@ int _dfs_postorder(BTree* t, void (*fn)(void*, void*), void* ctx) {
                 vecpush(stack, &new);
             }
         } else
-            fn(tmp.node, ctx);
+            fn(tmp.node, t, ctx);
     }
 
     vecdes(stack);
@@ -127,7 +87,7 @@ int _dfs_postorder(BTree* t, void (*fn)(void*, void*), void* ctx) {
     return 0;
 }
 
-int _bfs(BTree* t, void (*fn)(void*, void*), void* ctx) {
+static int _bfs(BTree* t, void (*fn)(BNode*, BTree* , void*), void* ctx) {
     if (!t || !fn) return -1;
     if (!t->head) return 0;
 
@@ -138,7 +98,7 @@ int _bfs(BTree* t, void (*fn)(void*, void*), void* ctx) {
     while (listsize(queue) > 0) {
         listpopf(queue, &tmp);
 
-        fn(tmp, ctx);
+        fn(tmp, t, ctx);
 
         if (tmp->left) listpushb(queue, &tmp->left);
         if (tmp->right) listpushb(queue, &tmp->right);
@@ -147,6 +107,33 @@ int _bfs(BTree* t, void (*fn)(void*, void*), void* ctx) {
     listdes(queue);
 
     return 0;
+}
+
+
+static BNode* _create_node(BTree* t, void* data) {
+    BNode* node = malloc(sizeof(BNode));
+    if (!node) return NULL;
+
+    node->data = malloc(t->el_size);
+    if (!node->data) {
+        free(node);
+        return NULL;
+    }
+
+    memcpy(node->data, data, t->el_size);
+
+    node->left = NULL;
+    node->right = NULL;
+
+    return node;
+}
+
+static void _free_node(BNode* n, BTree* t, void* ctx) {
+    (void)ctx;
+
+    t->size--;
+    free(n->data);
+    free(n);
 }
 
 
@@ -165,22 +152,9 @@ BTree* btree(size_t el_size, comparator comp, void* ctx) {
 
 void btreedes(BTree* t) {
     if (!t) return;
-
+    
     _dfs_postorder(t, _free_node, NULL);
     free(t);
-}
-
-void* btreesrch(BTree* t, void* data) {
-    if (!t || !data || !t->head) return NULL;
-
-    BNode* tmp = t->head;
-    while (tmp) {
-        int c = t->comp(data, tmp->data, t->ctx);
-        if (c == 0) return tmp->data;
-        tmp = c < 0 ? tmp->left : tmp->right;
-    }
-
-    return NULL;
 }
 
 int btreeins(BTree* t, void* data) {
@@ -215,6 +189,52 @@ int btreeins(BTree* t, void* data) {
     }
 
     return -1;
+}
+
+bool btreecont(BTree* t, void* data) {
+    if (!t || !data || !t->head) return false;
+
+    BNode* n = t->head;
+    while (n) {
+        int c = t->comp(data, n->data, t->ctx);
+        if (c == 0) return true;
+        n = c < 0 ? n->left : n->right;
+    }
+
+    return false;
+}
+
+BTree* btreeclone(BTree* t) {
+    if (!t) return NULL;
+
+    BTree* clone = btree(t->el_size, t->comp, t->ctx);
+    if (!t->head) return clone;
+
+    Vector* stack = vector(sizeof(_Frame), NULL, NULL);
+    _Frame tmp = {t->head, _create_node(clone, t->head->data)};
+
+    clone->head = tmp.clone;
+    clone->size = t->size;
+
+    vecpush(stack, &tmp);
+    while(vecsize(stack) > 0) {
+        vecpop(stack, &tmp);
+
+        if (tmp.origin->right) {
+            _Frame right = {tmp.origin->right, _create_node(clone, tmp.origin->right->data)};
+            tmp.clone->right = right.clone;
+            vecpush(stack, &right);
+        }
+        if (tmp.origin->left) {
+            _Frame left = {tmp.origin->left, _create_node(clone, tmp.origin->left->data)};
+            tmp.clone->left = left.clone;
+            vecpush(stack, &left);
+        }
+    }
+
+    vecdes(stack);
+
+    return clone;
 }
 
 size_t btreesize(BTree* t) { return t->size; }

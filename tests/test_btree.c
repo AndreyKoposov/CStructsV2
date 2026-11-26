@@ -23,7 +23,7 @@ void test_btree_insert(void) {
     btreedes(t);
 }
 
-void test_btree_search(void) {
+void test_btree_contains(void) {
     // Arrange
     BTree* t = btree(sizeof(int), comparator_int, NULL);
     int a = 3;
@@ -33,15 +33,37 @@ void test_btree_search(void) {
     btreeins(t, &c);
 
     // Act
-    int* _a = btreesrch(t, &a);
-    int* _c = btreesrch(t, &c);
-    int* _b = btreesrch(t, &b);
+    bool status1 = btreecont(t, &a);
+    bool status2 = btreecont(t, &c);
+    bool status3 = btreecont(t, &b);
 
     // Assert
-    CU_ASSERT_EQUAL(*_a, a);
-    CU_ASSERT_EQUAL(*_c, c);
-    CU_ASSERT_PTR_NULL(_b);
+    CU_ASSERT_TRUE(status1);
+    CU_ASSERT_TRUE(status2);
+    CU_ASSERT_FALSE(status3);
 
     // Clean up
     btreedes(t);
+}
+
+void test_btree_clone(void) {
+    // Arrange
+    BTree* t = btree(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+
+    btreeins(t, &a);
+    btreeins(t, &b);
+    btreeins(t, &c);
+
+    // Act
+    BTree* clone = btreeclone(t);
+
+    // Assert
+    CU_ASSERT_EQUAL(btreesize(t), btreesize(clone));
+
+    // Clean up
+    btreedes(t);
+    btreedes(clone);
 }
