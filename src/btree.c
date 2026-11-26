@@ -21,14 +21,6 @@ typedef struct btree {
 } BTree;
 
 
-static BNode* _get_successor_parent(BNode* begin) {
-    BNode* tmp = begin;
-    while (tmp->left->left) {
-        tmp = tmp->left;
-    }
-    return tmp;
-}
-
 static void _free_node(BTree* t, BNode* n) {
     free(n->data);
     free(n);
@@ -114,8 +106,9 @@ static BNode* _create_node(BTree* t, void* data) {
 
 static void _delete_node(BTree* t, BNode* n, BNode* prev) {
     if (!n->left && !n->right) {
-        if (prev->left == n) prev->left = NULL;
-        if (prev->right == n) prev->right = NULL;
+        if (!prev) t->head = NULL;
+        else if (prev->left == n) prev->left = NULL;
+        else prev->right = NULL;
     }
     else
     if (!n->left || !n->right) {
@@ -125,16 +118,20 @@ static void _delete_node(BTree* t, BNode* n, BNode* prev) {
         else prev->right = child;
     }
     else {
-        BNode* successor_parent = _get_successor_parent(n->right);
-        BNode* successor = successor_parent->left;
+        BNode* successor_parent = n;
+        BNode* successor = successor_parent->right;
+        while (successor->left) {
+            successor_parent = successor;
+            successor = successor->left;
+        }
         BNode* succ_right = successor->right;
 
         if (n->right == successor) {
-            n->right = succ_right;
-            successor->right = n->right;
+            //n->right = succ_right;
         }
         else {
             successor_parent->left = succ_right;
+            successor->right = n->right;
         }
 
         successor->left = n->left;
@@ -232,10 +229,8 @@ int btreedel(BTree* t, void* data) {
         }
     }
 
-    if (!found)
-        return 0;
-
-    _delete_node(t, n, prev);
+    if (found)
+        _delete_node(t, n, prev);
 
     return 0;
 }

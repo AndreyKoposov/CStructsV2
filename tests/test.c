@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
 
     if (!CU_add_test(btreeS, "Insert", test_btree_insert)) cleanup();
     if (!CU_add_test(btreeS, "Contains", test_btree_contains)) cleanup();
-    // if (!CU_add_test(btreeS, "Delete", test_btree_delete)) cleanup();
+    if (!CU_add_test(btreeS, "Delete", test_btree_delete)) cleanup();
     if (!CU_add_test(btreeS, "Clone", test_btree_clone)) cleanup();
     if (!CU_add_test(btreeS, "At", test_btree_at)) cleanup();
 
