@@ -46,24 +46,62 @@ void test_btree_contains(void) {
     btreedes(t);
 }
 
+void test_btree_delete(void) {
+    
+}
+
 void test_btree_clone(void) {
     // Arrange
     BTree* t = btree(sizeof(int), comparator_int, NULL);
     int a = 3;
     int b = 2;
     int c = 5;
+    int d = 10;
 
     btreeins(t, &a);
     btreeins(t, &b);
     btreeins(t, &c);
 
     // Act
-    BTree* clone = btreeclone(t);
+    BTree* clone1 = btreeclone(t);
+    BTree* clone2 = btreeclone(t);
+    btreeins(clone2, &d);
 
     // Assert
-    CU_ASSERT_EQUAL(btreesize(t), btreesize(clone));
+    CU_ASSERT_EQUAL(btreesize(t), btreesize(clone1));
+    CU_ASSERT_NOT_EQUAL(btreesize(t), btreesize(clone2));
 
     // Clean up
     btreedes(t);
-    btreedes(clone);
+    btreedes(clone1);
+    btreedes(clone2);
+}
+
+void test_btree_at(void) {
+    // Arrange
+    BTree* t = btree(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    int d = 10;
+
+    btreeins(t, &a);
+    btreeins(t, &b);
+    btreeins(t, &c);
+    btreeins(t, &d);
+
+    // Act
+    int _a, _d;
+    int status1 = btreeat(t, 1, &_a);
+    int status2 = btreeat(t, 3, &_d);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, 0);
+
+    CU_ASSERT_EQUAL(a, _a);
+    CU_ASSERT_EQUAL(d, _d);
+
+    // Clean up
+    btreedes(t);
 }
