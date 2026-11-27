@@ -66,7 +66,33 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(vectorS, "Comparator copy", test_copy_preserves_comparator_behavioral)) cleanup();
 
     if (!CU_add_test(btreeS, "Insert", test_btree_insert)) cleanup();
-    if (!CU_add_test(btreeS, "Search", test_btree_search)) cleanup();
+    if (!CU_add_test(btreeS, "Contains", test_btree_contains)) cleanup();
+    if (!CU_add_test(btreeS, "Delete #1", test_btree_delete_1)) cleanup();
+    if (!CU_add_test(btreeS, "Delete #2", test_btree_delete_2)) cleanup();
+    if (!CU_add_test(btreeS, "Delete #3", test_btree_delete_3)) cleanup();
+    if (!CU_add_test(btreeS, "Delete #4", test_btree_delete_4)) cleanup();
+    if (!CU_add_test(btreeS, "Delete #5", test_btree_delete_5)) cleanup();
+    if (!CU_add_test(btreeS, "Clone", test_btree_clone)) cleanup();
+    if (!CU_add_test(btreeS, "At", test_btree_at)) cleanup();
+    if (!CU_add_test(btreeS, "Min/Max", test_btree_min_max)) cleanup();
+    if (!CU_add_test(btreeS, "For", test_btree_for)) cleanup();
+    if (!CU_add_test(btreeS, "Or", test_btree_or)) cleanup();
+    if (!CU_add_test(btreeS, "And", test_btree_and)) cleanup();
+    if (!CU_add_test(btreeS, "Xor", test_btree_xor)) cleanup();
+    if (!CU_add_test(btreeS, "In", test_btree_in)) cleanup();
+    if (!CU_add_test(btreeS, "Clear", test_btree_clear)) cleanup();
+    if (!CU_add_test(btreeS, "Swap", test_btree_swap)) cleanup();
+    if (!CU_add_test(btreeS, "Move", test_btree_move)) cleanup();
+    if (!CU_add_test(btreeS, "To array", test_btree_to_array)) cleanup();
+    if (!CU_add_test(btreeS, "From array", test_btree_from_array)) cleanup();
+    if (!CU_add_test(btreeS, "Equals", test_btree_equals)) cleanup();
+    if (!CU_add_test(btreeS, "Basic lifecycle", test_btree_basic_lifecycle)) cleanup();
+    if (!CU_add_test(btreeS, "Delete cases", test_btree_delete_cases)) cleanup();
+    if (!CU_add_test(btreeS, "Subset cases", test_btree_subset)) cleanup();
+    if (!CU_add_test(btreeS, "Copy semantics", test_btree_copy_semantics)) cleanup();
+    if (!CU_add_test(btreeS, "To/From array", test_btree_array_roundtrip)) cleanup();
+    if (!CU_add_test(btreeS, "Error paths", test_btree_error_paths)) cleanup();
+    if (!CU_add_test(btreeS, "End to end", test_btree_end_to_end)) cleanup();
 
     if (!CU_add_test(listS, "Push front/back", test_list_push)) cleanup();
     if (!CU_add_test(listS, "Insert", test_list_insert)) cleanup();
