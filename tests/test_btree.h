@@ -1,5 +1,9 @@
 void test_btree_insert(void);
 void test_btree_contains(void);
-void test_btree_delete(void);
+void test_btree_delete_1(void);
+void test_btree_delete_2(void);
+void test_btree_delete_3(void);
+void test_btree_delete_4(void);
+void test_btree_delete_5(void);
 void test_btree_clone(void);
 void test_btree_at(void);

@@ -126,10 +126,7 @@ static void _delete_node(BTree* t, BNode* n, BNode* prev) {
         }
         BNode* succ_right = successor->right;
 
-        if (n->right == successor) {
-            //n->right = succ_right;
-        }
-        else {
+        if (n->right != successor) {
             successor_parent->left = succ_right;
             successor->right = n->right;
         }
