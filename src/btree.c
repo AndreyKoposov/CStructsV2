@@ -20,6 +20,31 @@ typedef struct btree {
     void* ctx;
 } BTree;
 
+typedef struct _trees {
+    BTree* t1;
+    BTree* t2;
+    BTree* t3;
+} _Trees;
+
+static void _or(void* data, void* ctx) {
+    BTree* t = ctx;
+    btreeins(t, data);
+}
+
+static void _and(void* data, void* ctx) {
+    _Trees* trees = ctx;
+    
+    if (btreecont(trees->t1, data) && btreecont(trees->t2, data))
+        btreeins(trees->t3, data);
+}
+
+static void _xor(void* data, void* ctx) {
+    _Trees* trees = ctx;
+    
+    if (btreecont(trees->t1, data) && !btreecont(trees->t2, data) ||
+        !btreecont(trees->t1, data) && btreecont(trees->t2, data))
+        btreeins(trees->t3, data);
+}
 
 static void _free_node(BTree* t, BNode* n) {
     free(n->data);
@@ -324,6 +349,95 @@ int btreefor(BTree* t, void (*fn)(void*, void*), void* ctx) {
     listdes(queue);
 
     return 0;
+}
+
+int btreeswp(BTree* t1, BTree* t2) {
+    if (!t1 || !t2) return -1;
+
+    BNode* tmp_head = t1->head;
+    size_t tmp_size = t1->size;
+    size_t tmp_el_size = t1->el_size;
+    comparator tmp_comp = t1->comp;
+    void* tmp_ctx = t1->ctx;
+
+    t1->head =t2->head;
+    t1->size = t2->size;
+    t1->el_size = t2->el_size;
+    t1->comp = t2->comp;
+    t1->ctx = t2->ctx;
+
+    t2->head = tmp_head;
+    t2->size = tmp_size;
+    t2->el_size = tmp_el_size;
+    t2->comp = tmp_comp;
+    t2->ctx = tmp_ctx;
+
+    return 0;
+}
+
+int btreeclear(BTree* t) {
+    if (!t) return -1;
+    if (!t->head) return 0;
+
+    _pop_node(t, t->head);
+
+    return 0;
+}
+
+int btreeor(BTree* t1, BTree* t2) {
+    if (!t1 || !t2 || t1->el_size != t2->el_size) return -1;
+    if (!t1->head && !t2->head) return 0;
+
+    return btreefor(t2, _or, t1);
+}
+
+int btreeand(BTree* t1, BTree* t2) {
+    if (!t1 || !t2 || t1->el_size != t2->el_size) return -1;
+    if (!t1->head && !t2->head) return 0;
+
+    BTree* t3 = btree(t1->el_size, t1->comp, t1->ctx);
+    _Trees trees = {t1, t2, t3};
+
+    btreefor(t1, _and, &trees);
+    btreeswp(t1, t3);
+    btreedes(t3);
+
+    return 0;
+}
+
+int btreexor(BTree* t1, BTree* t2) {
+    if (!t1 || !t2 || t1->el_size != t2->el_size) return -1;
+    if (!t1->head && !t2->head) return 0;
+
+    BTree* t3 = btree(t1->el_size, t1->comp, t1->ctx);
+    _Trees trees = {t1, t2, t3};
+
+    btreefor(t1, _xor, &trees);
+    btreeswp(t1, t3);
+    btreedes(t3);
+
+    return 0;
+}
+
+bool btreein(BTree* t1, BTree* t2) {
+    if (!t1 || !t2) return false;
+    if (!t1->head) return true;
+
+    Vector* stack = vector(sizeof(BNode*), NULL, NULL);
+    BNode* next = t1->head;
+
+    vecpush(stack, &next);
+    while (vecsize(stack) > 0) {
+        vecpop(stack, &next);
+
+        if (!btreecont(t2, next->data))
+            return false;
+
+        if (next->right) vecpush(stack, &next->right);
+        if (next->left) vecpush(stack, &next->left);
+    }
+
+    return true;
 }
 
 size_t btreesize(BTree* t) { return t->size; }
