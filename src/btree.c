@@ -281,15 +281,27 @@ int btreeat(BTree* t, size_t i, void* out) {
 }
 
 int btreemin(BTree* t, void* out) {
-    if (!t || !out) return -1;
+    if (!t || !t->head || !out) return -1;
 
-    return btreeat(t, 0, out);
+    BNode* min = t->head;
+    while (min->left)
+        min = min->left;
+
+    memcpy(out, min->data, t->el_size);
+
+    return 0;
 }
 
 int btreemax(BTree* t, void* out) {
-    if (!t || !out) return -1;
+    if (!t || !t->head || !out) return -1;
 
-    return btreeat(t, btreesize(t)-1, out);
+    BNode* max = t->head;
+    while (max->right)
+        max = max->right;
+
+    memcpy(out, max->data, t->el_size);
+
+    return 0;
 }
 
 int btreefor(BTree* t, void (*fn)(void*, void*), void* ctx) {

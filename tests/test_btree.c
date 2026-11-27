@@ -4,6 +4,13 @@
 #include "utils/comparators.h"
 
 
+static void _sum(void* data, void* ctx) {
+    int* val = data;
+    int* sum = ctx;
+
+    *sum += *val;
+}
+
 void test_btree_insert(void) {
     // Arrange
     BTree* t = btree(sizeof(int), comparator_int, NULL);
@@ -345,6 +352,68 @@ void test_btree_at(void) {
 
     CU_ASSERT_EQUAL(a, _a);
     CU_ASSERT_EQUAL(d, _d);
+
+    // Clean up
+    btreedes(t);
+}
+
+void test_btree_min_max(void) {
+    // Arrange
+    BTree* t = btree(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    int d = 10;
+    int e = 4;
+    int f = 13;
+
+    btreeins(t, &a);
+    btreeins(t, &b);
+    btreeins(t, &c);
+    btreeins(t, &d);
+    btreeins(t, &e);
+    btreeins(t, &f);
+
+    // Act
+    int min, max;
+    int status1 = btreemin(t, &min);
+    int status2 = btreemax(t, &max);
+
+    // Assert
+    CU_ASSERT_EQUAL(status1, 0);
+    CU_ASSERT_EQUAL(status2, 0);
+
+    CU_ASSERT_EQUAL(b, min);
+    CU_ASSERT_EQUAL(f, max);
+
+    // Clean up
+    btreedes(t);
+}
+
+void test_btree_for(void) {
+    // Arrange
+    BTree* t = btree(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    int d = 10;
+    int e = 4;
+    int f = 13;
+
+    btreeins(t, &a);
+    btreeins(t, &b);
+    btreeins(t, &c);
+    btreeins(t, &d);
+    btreeins(t, &e);
+    btreeins(t, &f);
+
+    // Act
+    int sum = 0;
+    int status = btreefor(t, _sum, &sum);
+
+    // Assert
+    CU_ASSERT_EQUAL(status, 0);
+    CU_ASSERT_EQUAL(sum, a+b+c+d+e+f);
 
     // Clean up
     btreedes(t);

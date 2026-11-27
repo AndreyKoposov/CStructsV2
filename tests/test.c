@@ -74,6 +74,8 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(btreeS, "Delete #5", test_btree_delete_5)) cleanup();
     if (!CU_add_test(btreeS, "Clone", test_btree_clone)) cleanup();
     if (!CU_add_test(btreeS, "At", test_btree_at)) cleanup();
+    if (!CU_add_test(btreeS, "Min/Max", test_btree_min_max)) cleanup();
+    if (!CU_add_test(btreeS, "For", test_btree_for)) cleanup();
 
     if (!CU_add_test(listS, "Push front/back", test_list_push)) cleanup();
     if (!CU_add_test(listS, "Insert", test_list_insert)) cleanup();

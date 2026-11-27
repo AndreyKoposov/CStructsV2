@@ -7,3 +7,5 @@ void test_btree_delete_4(void);
 void test_btree_delete_5(void);
 void test_btree_clone(void);
 void test_btree_at(void);
+void test_btree_min_max(void);
+void test_btree_for(void);
