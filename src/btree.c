@@ -488,9 +488,9 @@ void* btreetoarr(BTree* t) {
 }
 
 BTree* btreefromarr(void* arr, size_t len, size_t el_size, comparator comp, void* ctx) {
-    if (!arr) return NULL;
-
     BTree* t = btree(el_size, comp, ctx);
+    if (!arr) return t;
+
     char* c_arr = arr;
 
     for (size_t i = 0; i < len; i++)

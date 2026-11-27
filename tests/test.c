@@ -86,6 +86,13 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(btreeS, "To array", test_btree_to_array)) cleanup();
     if (!CU_add_test(btreeS, "From array", test_btree_from_array)) cleanup();
     if (!CU_add_test(btreeS, "Equals", test_btree_equals)) cleanup();
+    if (!CU_add_test(btreeS, "Basic lifecycle", test_btree_basic_lifecycle)) cleanup();
+    if (!CU_add_test(btreeS, "Delete cases", test_btree_delete_cases)) cleanup();
+    if (!CU_add_test(btreeS, "Subset cases", test_btree_subset)) cleanup();
+    if (!CU_add_test(btreeS, "Copy semantics", test_btree_copy_semantics)) cleanup();
+    if (!CU_add_test(btreeS, "To/From array", test_btree_array_roundtrip)) cleanup();
+    if (!CU_add_test(btreeS, "Error paths", test_btree_error_paths)) cleanup();
+    if (!CU_add_test(btreeS, "End to end", test_btree_end_to_end)) cleanup();
 
     if (!CU_add_test(listS, "Push front/back", test_list_push)) cleanup();
     if (!CU_add_test(listS, "Insert", test_list_insert)) cleanup();
