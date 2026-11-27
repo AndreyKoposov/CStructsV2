@@ -19,8 +19,8 @@ int btreedel(BTree* t, void* data);
 
 int btreeor(BTree* t1, BTree* t2);
 int btreeand(BTree* t1, BTree* t2);
+int btreexor(BTree* t1, BTree* t2);
 bool btreein(BTree* t1, BTree* t2);
-bool btreexor(BTree* t1, BTree* t2);
 
 int btreefor(BTree* t, void (*fn)(void*, void*), void* ctx);
 int btreeat(BTree* t, size_t i, void* out);
@@ -30,6 +30,7 @@ int btreemin(BTree* t, void* out);
 int btreeswp(BTree* t1, BTree* t2);
 int btreeclear(BTree* t);
 BTree* btreeclone(BTree* t);
+int btreemove(BTree* t1, BTree* t2);
 
 
 #endif

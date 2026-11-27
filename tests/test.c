@@ -76,6 +76,13 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(btreeS, "At", test_btree_at)) cleanup();
     if (!CU_add_test(btreeS, "Min/Max", test_btree_min_max)) cleanup();
     if (!CU_add_test(btreeS, "For", test_btree_for)) cleanup();
+    if (!CU_add_test(btreeS, "Or", test_btree_or)) cleanup();
+    if (!CU_add_test(btreeS, "And", test_btree_and)) cleanup();
+    if (!CU_add_test(btreeS, "Xor", test_btree_xor)) cleanup();
+    if (!CU_add_test(btreeS, "In", test_btree_in)) cleanup();
+    if (!CU_add_test(btreeS, "Clear", test_btree_clear)) cleanup();
+    if (!CU_add_test(btreeS, "Swap", test_btree_swap)) cleanup();
+    if (!CU_add_test(btreeS, "Move", test_btree_move)) cleanup();
 
     if (!CU_add_test(listS, "Push front/back", test_list_push)) cleanup();
     if (!CU_add_test(listS, "Insert", test_list_insert)) cleanup();

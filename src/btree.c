@@ -41,8 +41,7 @@ static void _and(void* data, void* ctx) {
 static void _xor(void* data, void* ctx) {
     _Trees* trees = ctx;
     
-    if (btreecont(trees->t1, data) && !btreecont(trees->t2, data) ||
-        !btreecont(trees->t1, data) && btreecont(trees->t2, data))
+    if (!btreecont(trees->t1, data) || !btreecont(trees->t2, data))
         btreeins(trees->t3, data);
 }
 
@@ -183,7 +182,8 @@ BTree* btree(size_t el_size, comparator comp, void* ctx) {
 void btreedes(BTree* t) {
     if (!t) return;
     
-    _pop_node(t, t->head);
+    if (t->head)
+        _pop_node(t, t->head);
     free(t);
 }
 
@@ -379,7 +379,24 @@ int btreeclear(BTree* t) {
     if (!t) return -1;
     if (!t->head) return 0;
 
-    _pop_node(t, t->head);
+    if (t->head)
+        _pop_node(t, t->head);
+    t->head = NULL;
+
+    return 0;
+}
+
+int btreemove(BTree* t1, BTree* t2) {
+    if (!t1 || !t2 || t1->el_size != t2->el_size) return -1;
+
+    btreeclear(t1);
+    t1->head = t2->head;
+    t1->size = t2->size;
+    t1->comp = t2->comp;
+    t1->ctx = t2->ctx;
+
+    t2->head = NULL;
+    t2->size = 0;
 
     return 0;
 }
@@ -413,6 +430,7 @@ int btreexor(BTree* t1, BTree* t2) {
     _Trees trees = {t1, t2, t3};
 
     btreefor(t1, _xor, &trees);
+    btreefor(t2, _xor, &trees);
     btreeswp(t1, t3);
     btreedes(t3);
 
@@ -430,12 +448,15 @@ bool btreein(BTree* t1, BTree* t2) {
     while (vecsize(stack) > 0) {
         vecpop(stack, &next);
 
-        if (!btreecont(t2, next->data))
+        if (!btreecont(t2, next->data)) {
+            vecdes(stack);
             return false;
+        }
 
         if (next->right) vecpush(stack, &next->right);
         if (next->left) vecpush(stack, &next->left);
     }
+    vecdes(stack);
 
     return true;
 }

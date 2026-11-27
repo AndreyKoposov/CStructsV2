@@ -418,3 +418,235 @@ void test_btree_for(void) {
     // Clean up
     btreedes(t);
 }
+
+void test_btree_or(void) {
+    // Arrange
+    BTree* t1 = btree(sizeof(int), comparator_int, NULL);
+    BTree* t2 = btree(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    int d = 10;
+    int e = 4;
+    int f = 13;
+
+    btreeins(t1, &a);
+    btreeins(t1, &b);
+    btreeins(t1, &c);
+    btreeins(t2, &d);
+    btreeins(t2, &e);
+    btreeins(t2, &f);
+
+    // Act
+    int status = btreeor(t1, t2);
+
+    // Assert
+    CU_ASSERT_EQUAL(status, 0);
+    
+    CU_ASSERT_TRUE(btreecont(t1, &a));
+    CU_ASSERT_TRUE(btreecont(t1, &b));
+    CU_ASSERT_TRUE(btreecont(t1, &c));
+    CU_ASSERT_TRUE(btreecont(t1, &d));
+    CU_ASSERT_TRUE(btreecont(t1, &e));
+    CU_ASSERT_TRUE(btreecont(t1, &f));
+
+    // Clean up
+    btreedes(t1);
+    btreedes(t2);
+}
+
+void test_btree_and(void) {
+    // Arrange
+    BTree* t1 = btree(sizeof(int), comparator_int, NULL);
+    BTree* t2 = btree(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    int d = 3;
+    int e = 2;
+    int f = 13;
+
+    btreeins(t1, &a);
+    btreeins(t1, &b);
+    btreeins(t1, &c);
+    btreeins(t2, &d);
+    btreeins(t2, &e);
+    btreeins(t2, &f);
+
+    // Act
+    int status = btreeand(t1, t2);
+
+    // Assert
+    CU_ASSERT_EQUAL(status, 0);
+    
+    CU_ASSERT_TRUE(btreecont(t1, &a));
+    CU_ASSERT_TRUE(btreecont(t1, &b));
+    
+    CU_ASSERT_FALSE(btreecont(t1, &c));
+    CU_ASSERT_FALSE(btreecont(t1, &f));
+
+    // Clean up
+    btreedes(t1);
+    btreedes(t2);
+}
+
+void test_btree_xor(void) {
+    // Arrange
+    BTree* t1 = btree(sizeof(int), comparator_int, NULL);
+    BTree* t2 = btree(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    int d = 3;
+    int e = 2;
+    int f = 13;
+
+    btreeins(t1, &a);
+    btreeins(t1, &b);
+    btreeins(t1, &c);
+    btreeins(t2, &d);
+    btreeins(t2, &e);
+    btreeins(t2, &f);
+
+    // Act
+    int status = btreexor(t1, t2);
+
+    // Assert
+    CU_ASSERT_EQUAL(status, 0);
+    
+    CU_ASSERT_TRUE(btreecont(t1, &c));
+    CU_ASSERT_TRUE(btreecont(t1, &f));
+    
+    CU_ASSERT_FALSE(btreecont(t1, &a));
+    CU_ASSERT_FALSE(btreecont(t1, &b));
+
+    // Clean up
+    btreedes(t1);
+    btreedes(t2);
+}
+
+void test_btree_in(void) {
+    // Arrange
+    BTree* t1 = btree(sizeof(int), comparator_int, NULL);
+    BTree* t2 = btree(sizeof(int), comparator_int, NULL);
+    BTree* t3 = btree(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+    int c = 5;
+    int d = 11;
+    int e = 7;
+    int f = 13;
+
+    btreeins(t1, &a);
+    btreeins(t1, &b);
+    btreeins(t1, &c);
+    btreeins(t1, &d);
+
+    btreeins(t2, &a);
+    btreeins(t2, &b);
+    btreeins(t2, &c);
+
+    btreeins(t3, &a);
+    btreeins(t3, &b);
+    btreeins(t3, &e);
+    btreeins(t3, &f);
+
+    // Act
+    bool status1 = btreein(t2, t1);
+    bool status2 = btreein(t3, t1);
+
+    // Assert
+    CU_ASSERT_TRUE(status1);
+    CU_ASSERT_FALSE(status2);
+
+    // Clean up
+    btreedes(t1);
+    btreedes(t2);
+    btreedes(t3);
+}
+
+void test_btree_clear(void) {
+    // Arrange
+    BTree* t = btree(sizeof(int), comparator_int, NULL);
+    int a = 3;
+    int b = 2;
+
+    btreeins(t, &a);
+    btreeins(t, &b);
+
+    // Act
+    int status = btreeclear(t);
+
+    // Assert
+    CU_ASSERT_EQUAL(status, 0);
+
+    CU_ASSERT_EQUAL(btreesize(t), 0);
+
+    // Clean up
+    btreedes(t);
+}
+
+void test_btree_swap(void) {
+    // Arrange
+    BTree* t1 = btree(sizeof(int), comparator_int, NULL);
+    BTree* t2 = btree(sizeof(int), comparator_int, NULL);
+
+    int a = 3;
+    int b = 2;
+    int d = 10;
+
+    btreeins(t1, &a);
+    btreeins(t1, &b);
+
+    btreeins(t2, &d);
+
+    // Act
+    int status = btreeswp(t1, t2);
+
+    // Assert
+    CU_ASSERT_EQUAL(status, 0);
+
+    CU_ASSERT_EQUAL(btreesize(t1), 1);
+    CU_ASSERT_EQUAL(btreesize(t2), 2);
+
+    CU_ASSERT_TRUE(btreecont(t1, &d));
+    CU_ASSERT_TRUE(btreecont(t2, &a));
+    CU_ASSERT_TRUE(btreecont(t2, &b));
+
+    // Clean up
+    btreedes(t1);
+    btreedes(t2);
+}
+
+void test_btree_move(void) {
+    // Arrange
+    BTree* t1 = btree(sizeof(int), comparator_int, NULL);
+    BTree* t2 = btree(sizeof(int), comparator_int, NULL);
+
+    int a = 3;
+    int b = 2;
+    int d = 10;
+
+    btreeins(t1, &a);
+    btreeins(t1, &b);
+    btreeins(t1, &d);
+
+    // Act
+    int status = btreemove(t2, t1);
+
+    // Assert
+    CU_ASSERT_EQUAL(status, 0);
+
+    CU_ASSERT_EQUAL(btreesize(t2), 3);
+    CU_ASSERT_EQUAL(btreesize(t1), 0);
+
+    CU_ASSERT_TRUE(btreecont(t2, &d));
+    CU_ASSERT_TRUE(btreecont(t2, &a));
+    CU_ASSERT_TRUE(btreecont(t2, &b));
+
+    CU_ASSERT_FALSE(btreecont(t1, &a));
+
+    // Clean up
+    btreedes(t1);
+    btreedes(t2);
+}
