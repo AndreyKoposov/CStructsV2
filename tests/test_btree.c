@@ -1,5 +1,7 @@
 #include <CUnit/Basic.h>
 
+#include <stdlib.h>
+
 #include "structs/btree.h"
 #include "utils/comparators.h"
 
@@ -649,4 +651,94 @@ void test_btree_move(void) {
     // Clean up
     btreedes(t1);
     btreedes(t2);
+}
+
+void test_btree_to_array(void) {
+    // Arrange
+    BTree* t1 = btree(sizeof(int), comparator_int, NULL);
+
+    int a = 3;
+    int b = 2;
+    int d = 10;
+
+    btreeins(t1, &a);
+    btreeins(t1, &b);
+    btreeins(t1, &d);
+
+    // Act
+    int* arr = btreetoarr(t1);
+
+    // Assert
+    CU_ASSERT_PTR_NOT_NULL_FATAL(arr);
+
+    CU_ASSERT_EQUAL(arr[0], 2);
+    CU_ASSERT_EQUAL(arr[1], 3);
+    CU_ASSERT_EQUAL(arr[2], 10);
+
+    // Clean up
+    btreedes(t1);
+    free(arr);
+}
+
+void test_btree_from_array(void) {
+    // Arrange
+    int arr[5] = {1,3,2,5,4};
+
+    // Act
+    BTree* t = btreefromarr(arr, 5, sizeof(int), comparator_int, NULL);
+
+    // Assert
+    CU_ASSERT_PTR_NOT_NULL_FATAL(t);
+
+    CU_ASSERT_EQUAL(btreesize(t), 5);
+
+    int a = 1;
+    int b = 3;
+    int c = 2;
+    int d = 5;
+    int e = 4;
+
+    CU_ASSERT_TRUE(btreecont(t, &a));
+    CU_ASSERT_TRUE(btreecont(t, &b));
+    CU_ASSERT_TRUE(btreecont(t, &c));
+    CU_ASSERT_TRUE(btreecont(t, &d));
+    CU_ASSERT_TRUE(btreecont(t, &e));
+
+    // Clean up
+    btreedes(t);
+}
+
+void test_btree_equals(void) {
+    // Arrange
+    BTree* t1 = btree(sizeof(int), comparator_int, NULL);
+    BTree* t2 = btree(sizeof(int), comparator_int, NULL);
+    BTree* t3 = btree(sizeof(int), comparator_int, NULL);
+
+    int a = 3;
+    int b = 2;
+    int d = 10;
+
+    btreeins(t1, &a);
+    btreeins(t1, &b);
+    btreeins(t1, &d);
+
+    btreeins(t2, &a);
+    btreeins(t2, &b);
+    btreeins(t2, &d);
+
+    btreeins(t3, &a);
+    btreeins(t3, &b);
+
+    // Act
+    bool status1 = btreeeq(t1, t2);
+    bool status2 = btreeeq(t1, t3);
+
+    // Assert
+    CU_ASSERT_TRUE(status1);
+    CU_ASSERT_FALSE(status2);
+
+    // Clean up
+    btreedes(t1);
+    btreedes(t2);
+    btreedes(t3);
 }

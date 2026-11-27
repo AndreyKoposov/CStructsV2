@@ -32,5 +32,9 @@ int btreeclear(BTree* t);
 BTree* btreeclone(BTree* t);
 int btreemove(BTree* t1, BTree* t2);
 
+void* btreetoarr(BTree* t);
+BTree* btreefromarr(void* arr, size_t len, size_t el_size, comparator comp, void* ctx);
+bool btreeeq(BTree* t1, BTree* t2);
+
 
 #endif

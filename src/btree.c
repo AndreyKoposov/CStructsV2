@@ -168,7 +168,7 @@ static void _delete_node(BTree* t, BNode* n, BNode* prev) {
 
 BTree* btree(size_t el_size, comparator comp, void* ctx) {
     BTree* t = malloc(sizeof(BTree));
-    if (!t) return NULL;
+    if (!t || el_size == 0) return NULL;
 
     t->head = NULL;
     t->size = 0;
@@ -459,6 +459,50 @@ bool btreein(BTree* t1, BTree* t2) {
     vecdes(stack);
 
     return true;
+}
+
+void* btreetoarr(BTree* t) {
+    if (!t) return NULL;
+
+    char* arr = malloc(t->size * t->el_size);
+    if (!arr) return NULL;
+    if (!t->head) return arr;
+
+    Vector* stack = vector(sizeof(BNode*), NULL, NULL);
+    BNode* current = t->head;
+    size_t i = 0;
+
+    while (current || vecsize(stack) > 0) {
+        while (current) {
+            vecpush(stack, &current);
+            current = current->left;
+        }
+        vecpop(stack, &current);
+        memcpy(arr + i*t->el_size, current->data, t->el_size);
+        i++;
+        current = current->right;
+    }
+    vecdes(stack);
+
+    return arr;
+}
+
+BTree* btreefromarr(void* arr, size_t len, size_t el_size, comparator comp, void* ctx) {
+    if (!arr) return NULL;
+
+    BTree* t = btree(el_size, comp, ctx);
+    char* c_arr = arr;
+
+    for (size_t i = 0; i < len; i++)
+        btreeins(t, c_arr + i*el_size);
+
+    return t;
+}
+
+bool btreeeq(BTree* t1, BTree* t2) {
+    if (!t1 || !t2) return false;
+
+    return btreein(t1, t2) && btreein(t2, t1);
 }
 
 size_t btreesize(BTree* t) { return t->size; }

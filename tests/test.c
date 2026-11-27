@@ -83,6 +83,9 @@ int main(int argc, char* argv[]) {
     if (!CU_add_test(btreeS, "Clear", test_btree_clear)) cleanup();
     if (!CU_add_test(btreeS, "Swap", test_btree_swap)) cleanup();
     if (!CU_add_test(btreeS, "Move", test_btree_move)) cleanup();
+    if (!CU_add_test(btreeS, "To array", test_btree_to_array)) cleanup();
+    if (!CU_add_test(btreeS, "From array", test_btree_from_array)) cleanup();
+    if (!CU_add_test(btreeS, "Equals", test_btree_equals)) cleanup();
 
     if (!CU_add_test(listS, "Push front/back", test_list_push)) cleanup();
     if (!CU_add_test(listS, "Insert", test_list_insert)) cleanup();

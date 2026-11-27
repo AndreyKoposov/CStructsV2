@@ -16,3 +16,6 @@ void test_btree_in(void);
 void test_btree_clear(void);
 void test_btree_swap(void);
 void test_btree_move(void);
+void test_btree_to_array(void);
+void test_btree_from_array(void);
+void test_btree_equals(void);
